@@ -5,12 +5,12 @@ import { OrderedDishHistory } from "./OrderedDishHistory";
 export class OrderHistory {
 
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id!: string;
 
   @Column()
-  completionDate: Date;
+  completionDate!: Date;
 
   @OneToMany(type => OrderedDishHistory, orderedDishHistory => orderedDishHistory.orderHistory)
-  orderedDishHistories: OrderedDishHistory[]
+  orderedDishHistories!: OrderedDishHistory[]
 
 }

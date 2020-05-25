@@ -6,15 +6,15 @@ import { OrderHistory } from "./OrderHistory";
 export class OrderedDishHistory {
 
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id!: string;
 
   @Column()
-  completionDate: Date;
+  completionDate!: Date;
 
   @ManyToOne(type => DishHistory, dishHistory => dishHistory.orderedDishHistories)
-  dishHistory: DishHistory
+  dishHistory!: DishHistory
 
   @ManyToOne(type => OrderHistory, orderHistory => orderHistory.orderedDishHistories)
-  orderHistory: OrderHistory
+  orderHistory!: OrderHistory
 
 }

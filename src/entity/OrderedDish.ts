@@ -6,15 +6,15 @@ import { Dish } from "./Dish";
 export class OrderedDish {
 
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id!: string;
 
   @Column()
-  dishCount: number;
+  dishCount!: number;
 
   @ManyToOne(type => Order, order => order.orderedDishes)
-  order: Order
+  order!: Order
 
   @ManyToOne(type => Dish, dish => dish.orderedDishes)
-  dish: Dish
+  dish!: Dish
 
 }

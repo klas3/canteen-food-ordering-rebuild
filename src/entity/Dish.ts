@@ -6,27 +6,27 @@ import { OrderedDish } from "./OrderedDish";
 export class Dish {
 
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id!: string;
 
   @Column()
-  name: string;
+  name!: string;
 
   @Column()
-  cost: number;
+  cost!: number;
 
   @Column()
-  description: number;
+  description!: number;
 
   @Column()
-  photo: string;
+  photo!: string;
 
   @Column()
-  imageMimeType: string;
+  imageMimeType!: string;
 
   @ManyToOne(type => Category, category => category.dishes)
-  categoty: Category
+  categoty!: Category
 
   @OneToMany(type => OrderedDish, orderedDish => orderedDish.dish)
-  orderedDishes: OrderedDish[]
+  orderedDishes!: OrderedDish[]
 
 }

@@ -5,12 +5,12 @@ import { Dish } from "./Dish";
 export class Category {
 
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id!: string;
 
   @Column()
-  name: string;
+  name!: string;
 
   @OneToMany(type => Dish, dish => dish.categoty)
-  dishes: Dish[]
+  dishes!: Dish[]
 
 }

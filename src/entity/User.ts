@@ -1,31 +1,41 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, BeforeInsert } from "typeorm";
+import * as bcrypt from 'bcrypt';
 import { Order } from "./Order";
 
 @Entity()
 export class User {
 
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id!: string;
 
   @Column()
-  login: string;
+  login!: string;
 
   @Column()
-  password: string;
+  password!: string;
 
   @Column()
-  email: string;
+  email!: string;
 
   @Column()
-  pushToken: string;
+  pushToken!: string;
 
   @Column()
-  resetCode: string;
+  resetCode!: string;
   
   @Column()
-  lastResetCodeCreationTime: Date
+  lastResetCodeCreationTime!: Date
 
   @OneToMany(type => Order, order => order.user)
-  orders: Order[]
+  orders!: Order[]
+
+  @BeforeInsert()
+  async hashPassword() {
+    this.password = await bcrypt.hash(this.password, 10);
+  }
+
+  async comparePassword(password: string): Promise<boolean> {
+    return await bcrypt.compare(password, this.password);
+  }
 
 }

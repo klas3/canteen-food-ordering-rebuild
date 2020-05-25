@@ -6,30 +6,30 @@ import { User } from './User';
 export class Order {
 
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id!: string;
 
   @Column()
-  creationDate: Date;
+  creationDate!: Date;
 
   @Column()
-  desiredDate: Date;
+  desiredDate!: Date;
 
   @Column()
-  wishes: string;
+  wishes!: string;
 
   @Column()
-  totalSum: number;
+  totalSum!: number;
 
   @Column()
-  isPaid: boolean;
+  isPaid!: boolean;
 
   @Column()
-  isReady: boolean;
+  isReady!: boolean;
 
   @ManyToOne(type => User, user => user.orders)
-  user: User
+  user!: User
 
   @OneToMany(type => OrderedDish, orderedDish => orderedDish.order)
-  orderedDishes: OrderedDish[]
+  orderedDishes!: OrderedDish[]
 
 }

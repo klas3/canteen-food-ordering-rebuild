@@ -5,18 +5,18 @@ import { OrderedDishHistory } from "./OrderedDishHistory";
 export class DishHistory {
 
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id!: string;
 
   @Column()
-  name: string;
+  name!: string;
 
   @Column()
-  cost: number;
+  cost!: number;
 
   @Column()
-  description: string;
+  description!: string;
 
   @OneToMany(type => OrderedDishHistory, orderedDishHistory => orderedDishHistory.dishHistory)
-  orderedDishHistories: OrderedDishHistory[]
+  orderedDishHistories!: OrderedDishHistory[]
 
 }
