@@ -1,6 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, BeforeInsert } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, BeforeInsert, ManyToOne } from "typeorm";
 import * as bcrypt from 'bcrypt';
 import { Order } from "./Order";
+import { Roles } from "../auth/roles";
 
 @Entity()
 export class User {
@@ -29,6 +30,9 @@ export class User {
   @OneToMany(type => Order, order => order.user)
   orders!: Order[]
 
+  @Column()
+  role!: Roles
+
   @BeforeInsert()
   async hashPassword() {
     this.password = await bcrypt.hash(this.password, 10);
@@ -36,6 +40,10 @@ export class User {
 
   async comparePassword(password: string): Promise<boolean> {
     return await bcrypt.compare(password, this.password);
+  }
+
+  isInRole(role: Roles) {
+    return this.role === role;
   }
 
 }
