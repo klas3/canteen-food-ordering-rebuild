@@ -1,5 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, BeforeInsert } from "typeorm";
 import { Dish } from "./Dish";
+import { v4 as uuidv4 } from 'uuid';
 
 @Entity()
 export class Category {
@@ -11,6 +12,11 @@ export class Category {
   name!: string;
 
   @OneToMany(type => Dish, dish => dish.categoty)
-  dishes!: Dish[]
+  dishes!: Dish[];
+
+  @BeforeInsert()
+  generateId() {
+    this.id = uuidv4();
+  }
 
 }

@@ -1,6 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, BeforeInsert } from "typeorm";
 import { Category } from './Category';
 import { OrderedDish } from "./OrderedDish";
+import { v4 as uuidv4 } from 'uuid';
 
 @Entity()
 export class Dish {
@@ -23,10 +24,18 @@ export class Dish {
   @Column()
   imageMimeType!: string;
 
+  @Column()
+  categoryId!: string;
+
   @ManyToOne(type => Category, category => category.dishes)
-  categoty!: Category
+  categoty!: Category;
 
   @OneToMany(type => OrderedDish, orderedDish => orderedDish.dish)
-  orderedDishes!: OrderedDish[]
+  orderedDishes!: OrderedDish[];
+
+  @BeforeInsert()
+  generateId() {
+    this.id = uuidv4();
+  }
 
 }

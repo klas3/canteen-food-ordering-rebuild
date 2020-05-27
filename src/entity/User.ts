@@ -2,6 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, OneToMany, BeforeInsert, ManyTo
 import * as bcrypt from 'bcrypt';
 import { Order } from "./Order";
 import { Roles } from "../auth/roles";
+import { v4 as uuidv4 } from 'uuid';
 
 @Entity()
 export class User {
@@ -19,13 +20,13 @@ export class User {
   email!: string;
 
   @Column()
-  pushToken!: string;
+  pushToken?: string;
 
   @Column()
-  resetCode!: string;
+  resetCode?: string;
   
   @Column()
-  lastResetCodeCreationTime!: Date
+  lastResetCodeCreationTime?: Date
 
   @OneToMany(type => Order, order => order.user)
   orders!: Order[]
@@ -34,8 +35,9 @@ export class User {
   role!: Roles
 
   @BeforeInsert()
-  async hashPassword() {
+  async handleFields() {
     this.password = await bcrypt.hash(this.password, 10);
+    this.id = uuidv4();
   }
 
   async comparePassword(password: string): Promise<boolean> {

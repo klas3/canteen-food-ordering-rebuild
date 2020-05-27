@@ -1,5 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, BeforeInsert } from "typeorm";
 import { OrderedDishHistory } from "./OrderedDishHistory";
+import { v4 as uuidv4 } from 'uuid';
 
 @Entity()
 export class OrderHistory {
@@ -12,5 +13,10 @@ export class OrderHistory {
 
   @OneToMany(type => OrderedDishHistory, orderedDishHistory => orderedDishHistory.orderHistory)
   orderedDishHistories!: OrderedDishHistory[]
+
+  @BeforeInsert()
+  generateId() {
+    this.id = uuidv4();
+  }
 
 }

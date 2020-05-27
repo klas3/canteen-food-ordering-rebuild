@@ -1,6 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne, BeforeInsert } from "typeorm";
 import { OrderedDish } from './OrderedDish';
 import { User } from './User';
+import { v4 as uuidv4 } from 'uuid';
 
 @Entity()
 export class Order {
@@ -26,10 +27,18 @@ export class Order {
   @Column()
   isReady!: boolean;
 
+  @Column()
+  userId!: string;
+
   @ManyToOne(type => User, user => user.orders)
-  user!: User
+  user!: User;
 
   @OneToMany(type => OrderedDish, orderedDish => orderedDish.order)
-  orderedDishes!: OrderedDish[]
+  orderedDishes!: OrderedDish[];
+
+  @BeforeInsert()
+  generateId() {
+    this.id = uuidv4();
+  }
 
 }
