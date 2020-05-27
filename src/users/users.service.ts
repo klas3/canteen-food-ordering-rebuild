@@ -1,20 +1,40 @@
 import { Injectable } from '@nestjs/common';
-import { Repository } from 'typeorm';
-import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../entity/User';
+import { UsersRepository } from './users.repository';
 
 @Injectable()
 export class UsersService {
-  constructor(
-    @InjectRepository(User)
-    private usersRepository: Repository<User>,
-	) {}
+  constructor(private usersRepository: UsersRepository) {}
 
-  async findById(id: string): Promise<User | undefined> {
-    return this.usersRepository.findOne(id);
+	async getById(id: string): Promise<User | undefined> {
+		return await this.usersRepository.getById(id);
 	}
-	
-	async findByLogin(login: string): Promise<User | undefined> {
-		return this.usersRepository.findOne({ login });
+
+	async isLoginUnique(login: string): Promise<boolean> {
+		return await this.usersRepository.isLoginUnique(login);
+	}
+
+	async isEmailUnique(email: string): Promise<boolean> {
+		return await this.usersRepository.isEmailUnique(email);
+	}
+
+	async getEmailById(id: string): Promise<string> {
+		return await this.usersRepository.getEmailById(id);
+	}
+
+	async setPushToken(pushToken: string, id: string): Promise<void> {
+		await this.usersRepository.setPushToken(pushToken, id);
+	}
+
+	async getByLogin(login: string): Promise<User | undefined> {
+		return await this.usersRepository.getByLogin(login);
+	}
+
+	async setResetCode(resetCode: string, id: string): Promise<void> {
+		await this.usersRepository.setResetCode(resetCode, id);
+	}
+
+	async clearResetCode(id: string): Promise<void> {
+		await this.usersRepository.clearResetCode(id);
 	}
 }

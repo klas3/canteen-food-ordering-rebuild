@@ -10,7 +10,7 @@ export class AuthService {
   ) {}
 
   async login(login: string, password: string): Promise<{}> {
-    const user = await this.usersService.findByLogin(login);
+    const user = await this.usersService.getByLogin(login);
     if (!user || !user.comparePassword(password)) {
       throw new UnauthorizedException();
     }
