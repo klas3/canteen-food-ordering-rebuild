@@ -35,7 +35,7 @@ export class User {
   role!: Roles
 
   @BeforeInsert()
-  async handleFields() {
+  async handleInsertion() {
     this.password = await bcrypt.hash(this.password, 10);
     this.id = uuidv4();
   }

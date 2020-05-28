@@ -10,7 +10,7 @@ export class OrderedDishHistory {
   id!: string;
 
   @Column()
-  completionDate!: Date;
+  dishCount!: number;
 
   @Column()
   dishHistoryId!: string;

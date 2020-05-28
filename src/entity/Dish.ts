@@ -16,7 +16,7 @@ export class Dish {
   cost!: number;
 
   @Column()
-  description!: number;
+  description!: string;
 
   @Column()
   photo!: string;

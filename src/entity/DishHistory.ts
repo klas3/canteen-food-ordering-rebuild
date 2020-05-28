@@ -17,12 +17,16 @@ export class DishHistory {
   @Column()
   description!: string;
 
+  @Column()
+  creationDate!: Date;
+
   @OneToMany(type => OrderedDishHistory, orderedDishHistory => orderedDishHistory.dishHistory)
   orderedDishHistories!: OrderedDishHistory[];
 
   @BeforeInsert()
-  generateId() {
+  handleInsertion() {
     this.id = uuidv4();
+    this.creationDate = new Date();
   }
 
 }

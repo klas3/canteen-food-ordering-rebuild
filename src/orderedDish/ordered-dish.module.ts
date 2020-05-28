@@ -1,10 +1,11 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { OrderedDishRepository } from './orderedDish.repository';
 import { OrderedDishService } from './ordered-dish.service';
+import { OrderedDish } from '../entity/OrderedDish';
+import { OrderedDishHistory } from '../entity/OrderedDishHistory';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([OrderedDishRepository])],
+  imports: [TypeOrmModule.forFeature([OrderedDish, OrderedDishHistory])],
   providers: [OrderedDishService],
   exports: [OrderedDishService],
 })
