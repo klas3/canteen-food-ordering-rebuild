@@ -1,7 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, BeforeInsert } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany } from "typeorm";
 import { Category } from './Category';
 import { OrderedDish } from "./OrderedDish";
-import { v4 as uuidv4 } from 'uuid';
 import { IsNotEmpty } from "class-validator";
 
 @Entity()
@@ -36,10 +35,5 @@ export class Dish {
 
   @OneToMany(type => OrderedDish, orderedDish => orderedDish.dish)
   orderedDishes!: OrderedDish[];
-
-  @BeforeInsert()
-  generateId() {
-    this.id = uuidv4();
-  }
 
 }

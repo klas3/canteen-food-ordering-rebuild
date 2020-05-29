@@ -2,7 +2,7 @@ import { Controller, Post, Body, Get, BadRequestException } from '@nestjs/common
 import { CategoryService } from './category.service';
 import { Category } from '../entity/Category';
 import { Authorize, ForRoles } from '../auth/auth.decorators';
-import { Roles } from 'src/auth/roles';
+import { Roles } from '../auth/roles';
 
 @Authorize()
 @Controller('category')

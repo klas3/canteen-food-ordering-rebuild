@@ -1,7 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne, BeforeInsert } from "typeorm";
 import { OrderedDish } from './OrderedDish';
 import { User } from './User';
-import { v4 as uuidv4 } from 'uuid';
+import { IsNotEmpty } from "class-validator";
 
 @Entity()
 export class Order {
@@ -12,6 +12,7 @@ export class Order {
   @Column()
   creationDate!: Date;
 
+  @IsNotEmpty()
   @Column()
   desiredDate!: Date;
 
@@ -27,18 +28,15 @@ export class Order {
   @Column()
   isReady!: boolean;
 
+  @IsNotEmpty()
   @Column()
   userId!: string;
 
   @ManyToOne(type => User, user => user.orders)
   user!: User;
 
+  @IsNotEmpty()
   @OneToMany(type => OrderedDish, orderedDish => orderedDish.order)
   orderedDishes!: OrderedDish[];
-
-  @BeforeInsert()
-  generateId() {
-    this.id = uuidv4();
-  }
 
 }

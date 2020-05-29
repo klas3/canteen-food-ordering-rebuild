@@ -1,8 +1,8 @@
 import { Controller, Post, Body, BadRequestException, Get } from '@nestjs/common';
 import { DishService } from './dish.service';
 import { Dish } from '../entity/Dish';
-import { Authorize, ForRoles } from 'src/auth/auth.decorators';
-import { Roles } from 'src/auth/roles';
+import { Authorize, ForRoles } from '../auth/auth.decorators';
+import { Roles } from '../auth/roles';
 
 @Authorize()
 @Controller('dish')

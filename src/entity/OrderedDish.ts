@@ -1,7 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, BeforeInsert } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm";
 import { Order } from "./Order";
 import { Dish } from "./Dish";
-import { v4 as uuidv4 } from 'uuid';
+import { IsNotEmpty, ValidateNested } from "class-validator";
 
 @Entity()
 export class OrderedDish {
@@ -9,12 +9,15 @@ export class OrderedDish {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
+  @ValidateNested()
+  @IsNotEmpty()
   @Column()
   dishCount!: number;
 
   @Column()
   orderId!: string;
 
+  @IsNotEmpty()
   @Column()
   dishId!: string;
 
@@ -23,10 +26,5 @@ export class OrderedDish {
 
   @ManyToOne(type => Dish, dish => dish.orderedDishes)
   dish!: Dish;
-
-  @BeforeInsert()
-  generateId() {
-    this.id = uuidv4();
-  }
 
 }
