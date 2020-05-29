@@ -2,6 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, BeforeIns
 import { Category } from './Category';
 import { OrderedDish } from "./OrderedDish";
 import { v4 as uuidv4 } from 'uuid';
+import { IsNotEmpty } from "class-validator";
 
 @Entity()
 export class Dish {
@@ -9,12 +10,15 @@ export class Dish {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
+  @IsNotEmpty()
   @Column()
   name!: string;
 
+  @IsNotEmpty()
   @Column()
   cost!: number;
 
+  @IsNotEmpty()
   @Column()
   description!: string;
 

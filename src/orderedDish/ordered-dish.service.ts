@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { OrderedDish } from 'src/entity/OrderedDish';
-import { OrderedDishHistory } from 'src/entity/OrderedDishHistory';
+import { OrderedDish } from '../entity/OrderedDish';
+import { OrderedDishHistory } from '../entity/OrderedDishHistory';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 

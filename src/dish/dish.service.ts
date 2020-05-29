@@ -23,14 +23,15 @@ export class DishService {
     await this.createHistory(dish);
   }
 
-  async delete(id: string, name: string): Promise<void> {
-    await this.dishRepository.delete(id);
-    const history = await this.dishHistoryRepository.find({ name });
+  async delete(id: string): Promise<void> {
+    const dish = await this.dishRepository.findOne({ id });
+    const history = await this.dishHistoryRepository.find({ name: dish?.name });
     history.forEach(async (dish) => {
       if (dish.orderedDishHistories.length === 0) {
         await this.dishHistoryRepository.delete(dish);
       }
     });
+    await this.dishRepository.delete(id);
   }
 
   async getById(id: string): Promise<Dish | undefined> {
@@ -43,6 +44,10 @@ export class DishService {
 
   async getAll(): Promise<Dish[]> {
     return await this.dishRepository.find();
+  }
+
+  verifyImageSize(photo: string, size: number): boolean {
+    return atob(photo).length <= size;
   }
 
   private async createHistory(dish: Dish): Promise<void> {

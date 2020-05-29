@@ -1,8 +1,8 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, BeforeInsert, ManyToOne } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, BeforeInsert, ManyToOne, BaseEntity } from "typeorm";
 import * as bcrypt from 'bcrypt';
 import { Order } from "./Order";
 import { Roles } from "../auth/roles";
-import { v4 as uuidv4 } from 'uuid';
+import { IsNotEmpty } from 'class-validator';
 
 @Entity()
 export class User {
@@ -10,12 +10,15 @@ export class User {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
+  @IsNotEmpty()
   @Column()
   login!: string;
 
+  @IsNotEmpty()
   @Column()
   password!: string;
 
+  @IsNotEmpty()
   @Column()
   email!: string;
 
@@ -26,22 +29,25 @@ export class User {
   resetCode?: string;
   
   @Column()
-  lastResetCodeCreationTime?: Date
+  lastResetCodeCreationTime?: Date;
 
   @OneToMany(type => Order, order => order.user)
   orders!: Order[]
 
   @Column()
-  role!: Roles
+  role!: Roles;
 
-  @BeforeInsert()
-  async handleInsertion() {
-    this.password = await bcrypt.hash(this.password, 10);
-    this.id = uuidv4();
+  async changePassword(newPassword: string): Promise<void> {
+    this.password = await bcrypt.hash(newPassword, 10);
   }
 
   async comparePassword(password: string): Promise<boolean> {
     return await bcrypt.compare(password, this.password);
+  }
+
+  setResetCode(code: string): void {
+    this.resetCode = code;
+    this.lastResetCodeCreationTime = new Date();
   }
 
   isInRole(role: Roles) {

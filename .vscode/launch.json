@@ -6,7 +6,7 @@
       "request": "launch",
       "name": "Debug Nest Framework",
       "runtimeArgs": ["--nolazy", "-r", "ts-node/register"],
-      "args": ["${workspaceFolder}/src/app/main.ts"],
+      "args": ["${workspaceFolder}/src/main.ts"],
       "preLaunchTask": "npm: build",
       "autoAttachChildProcesses": true
     }

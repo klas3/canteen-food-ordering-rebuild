@@ -1,0 +1,104 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email</title>
+    <style>
+        h1, h2 {
+            padding: 0px;
+            margin: 0px;
+        }
+        .mainContainer {
+            width: 95%;
+            height: 500px;
+            position: relative;
+            background-color: rgb(250, 211, 57);
+            border-radius: 0px 0px 15px 15px;
+        }
+        .headerContainer {
+            display: flex;
+            align-items: center;
+            justify-content: left;
+            width: 720px;
+            flex-wrap: wrap;
+            margin-left: 90px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        .mainTitlePart {
+            font-family: Arial, sans-serif;
+            font-size: 40px;
+            margin: 0, auto;
+        }
+        .secondTitlePart {
+            margin-left: 20px;
+            margin-top: 13.5px;
+            font-family: Courier;
+            letter-spacing: 10px;
+            font-size: 30px;
+        }
+        .contentContainer {
+            width: 720px;
+            height: 450px;
+            background-color: white;
+            border-radius: 20px;
+        }
+        .recoveryCodeContainer {
+            margin-bottom: 50px;
+            width: 80%;
+            background-color: rgb(249, 255, 132);
+            border-radius: 100px;
+        }
+        .footer {
+            font-style: italic;
+            font-size: smaller;
+        }
+    </style>
+</head>
+<body>
+    <table class="mainContainer" align="center" border="0" cellspacing="0" cellpadding="0">
+        <tbody>
+            <tr>
+                <td>
+                    <div class="headerContainer">
+                        <img src="./shared/PPC_logo.png" style="width: 72px;" />
+                        <div align="left" style="display: flex;">
+                            <h1 class="mainTitlePart">PPC</h1>
+                            <h2 class="secondTitlePart">Canteen</h2>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td align="center">
+                    <table class="contentContainer">
+                        <tbody>
+                            <tr>
+                                <td align="center">
+                                    <div style="margin-bottom: 50px;">
+                                        <h1 style="margin-bottom: 50px;">Привіт, {username}</h1>
+                                        <h2>Ваш код відновлення паролю:</h2>
+                                    </div>
+                                    <div class="recoveryCodeContainer">
+                                        <h1 style="font-size: 80px;">
+                                            {message}
+                                        </h1>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td align="center">
+                    <p class="footer">
+                        © 2020 PPC Canteen
+                    </p>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>
