@@ -10,7 +10,7 @@
     "outDir": "./dist",
     "baseUrl": "./",
     "strict": true,
-    "sourceRoot": "./src",
+    "sourceRoot": "./src"
   },
   "exclude": ["node_modules", "dist"]
 }

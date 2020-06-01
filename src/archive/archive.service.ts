@@ -71,7 +71,6 @@ export class ArchiveService {
     return dishes.filter((dish) => {
       const completionDate = new Date(dish.orderHistory.completionDate);
       completionDate.setHours(0, 0, 0, 0);
-      console.log(date, completionDate, date.getTime() === completionDate.getTime(), dish.dishHistory.creationDate.getTime() >= completionDate.getTime())
       if (date.getTime() === completionDate.getTime() && 
           dish.dishHistory.creationDate.getTime() >= completionDate.getTime()) {
         return true;

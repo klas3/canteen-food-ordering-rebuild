@@ -6,7 +6,6 @@ import { User } from '../entity/User';
 import { Roles } from '../auth/roles';
 import { DishService } from '../dish/dish.service';
 import { ArchiveService } from '../archive/archive.service';
-import { OrderedDishHistory } from '../entity/OrderedDishHistory';
 
 @Authorize()
 @Controller('order')
@@ -138,7 +137,11 @@ export class OrderController {
   }
 
   @Get(':date')
-  async getArchivedOrders(@Param('date') date: string): Promise<{}[]> {
+  async getArchivedOrders(@Param('date') date: string): Promise<{ 
+    count: number, 
+    name: string, 
+    cost: number 
+  }[]> {
     const dishes = await this.archiveService.getOrderedDishesHistoryByDate(new Date(date));
     return dishes.map((dish) => {
       return {
