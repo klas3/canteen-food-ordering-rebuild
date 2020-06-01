@@ -8,9 +8,10 @@ import { OrderedDishModule } from '../orderedDish/ordered-dish.module';
 import { CategoryModule } from '../category/category.module';
 import { OrderModule } from '../order/order.module';
 import { DishModule } from '../dish/dish.module';
+import { ArchiveModule } from '../archive/archive.module';
 
 @Module({
-  imports: [TypeOrmModule.forRoot(), UserModule, AuthModule, OrderedDishModule, CategoryModule, OrderModule, DishModule],
+  imports: [TypeOrmModule.forRoot(), UserModule, AuthModule, OrderedDishModule, CategoryModule, OrderModule, DishModule, ArchiveModule],
   controllers: [AppController],
   providers: [AppService],
 })

@@ -1,12 +1,16 @@
-import { Controller, Post, Body, BadRequestException } from '@nestjs/common';
+import { Controller, Post, Body, BadRequestException, NotFoundException, ForbiddenException, UnauthorizedException } from '@nestjs/common';
 import { User } from '../entity/User';
 import { AuthService } from './auth.service';
 import { Roles } from './roles';
-import { Authorize, GetUser } from './auth.decorators';
+import { Authorize, GetUser, ForRoles } from './auth.decorators';
+import { UserService } from '../user/user.service';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private userService: UserService,
+  ) {}
 
   @Post('login')
   async login(
@@ -16,19 +20,27 @@ export class AuthController {
     if (!login || !password) {
       throw new BadRequestException();
     }
-    return await this.authService.login(login, password);
+    const user = await this.userService.getByLogin(login);
+    if (!user || !await user.comparePassword(password)) {
+      throw new UnauthorizedException('Неправильний логін або пароль');
+    }
+    return await this.authService.login(user);
   }
 
   @Post('register')
   async register(@Body() user: User): Promise<void> {
+    await this.verifyRegistration(user);
     return await this.authService.register(user, Roles.Customer);
   }
 
   @Post('registerWorker')
+  @Authorize()
+  @ForRoles(Roles.Admin)
   async registerWorker(@Body() user: User): Promise<void> {
     if (!user.role || user.role === Roles.Admin) {
       throw new BadRequestException();
     }
+    await this.verifyRegistration(user);
     return await this.authService.register(user, user.role);
   }
 
@@ -42,7 +54,10 @@ export class AuthController {
     if(!oldPassword || !newPassword) {
       throw new BadRequestException();
     }
-    return await this.authService.changePassword(user, oldPassword, newPassword);
+    if (!await user.comparePassword(oldPassword)) {
+      throw new UnauthorizedException('Неправильний старий пароль');
+    }
+    return await this.authService.changePassword(user, newPassword);
   }
 
   @Post('requestResetPassword')
@@ -50,7 +65,11 @@ export class AuthController {
     if (!email) {
       throw new BadRequestException();
     }
-    return await this.authService.requestResetPassword(email);
+    const user = await this.userService.getByEmail(email);
+    if (!user) {
+      throw new NotFoundException();
+    }
+    return await this.authService.requestResetPassword(user);
   }
 
   @Post('verifyResetCode')
@@ -61,7 +80,21 @@ export class AuthController {
     if (!email || !code) {
       throw new BadRequestException();
     }
-    return await this.authService.verifyResetCode(email, code);
+    const user = await this.userService.getByEmail(email);
+    if (!user) {
+      throw new NotFoundException();
+    }
+    if(user.resetCode !== code) {
+      throw new ForbiddenException('Ви ввели невірний код');
+    }
+    if (user.lastResetCodeCreationTime
+      && new Date(user.lastResetCodeCreationTime.getTime() 
+      + this.authService.extraResetCodeMinutes * this.authService.msMinutes).getTime()
+      < new Date().getTime()) {
+      await this.userService.clearResetCode(user.id);
+      throw new ForbiddenException('Ваш код вже недійсний');
+    }
+    return;
   }
 
   @Post('resetPassword')
@@ -73,6 +106,22 @@ export class AuthController {
     if (!email || !code || !newPassword) {
       throw new BadRequestException();
     }
-    return await this.authService.resetPassword(newPassword, email, code);
+    const user = await this.userService.getByEmail(email);
+    if (!user) {
+      throw new NotFoundException();
+    }
+    if(user.resetCode !== code) {
+      throw new ForbiddenException('Ви ввели невірний код');
+    }
+    return await this.authService.resetPassword(newPassword, user);
+  }
+
+  private async verifyRegistration(user: User): Promise<void> {
+    if (!await this.userService.isLoginUnique(user.login)) {
+      throw new BadRequestException(`Логін ${user.login} вже зайнятий`);
+    }
+    if (!await this.userService.isEmailUnique(user.email)) {
+      throw new BadRequestException('Ця пошта вже зареєстрована');
+    }
   }
 }

@@ -1,7 +1,8 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, OneToOne, JoinTable } from "typeorm";
 import { Category } from './Category';
 import { OrderedDish } from "./OrderedDish";
 import { IsNotEmpty } from "class-validator";
+import { DishHistory } from "./DishHistory";
 
 @Entity()
 export class Dish {
@@ -17,7 +18,6 @@ export class Dish {
   @Column()
   cost!: number;
 
-  @IsNotEmpty()
   @Column()
   description!: string;
 
@@ -28,10 +28,18 @@ export class Dish {
   imageMimeType!: string;
 
   @Column()
+  dishHistoryId!: string;
+
+  @OneToOne(type => DishHistory)
+  @JoinTable()
+  dishHistory!: DishHistory;
+
+  @IsNotEmpty()
+  @Column()
   categoryId!: string;
 
   @ManyToOne(type => Category, category => category.dishes)
-  categoty!: Category;
+  category!: Category;
 
   @OneToMany(type => OrderedDish, orderedDish => orderedDish.dish)
   orderedDishes!: OrderedDish[];

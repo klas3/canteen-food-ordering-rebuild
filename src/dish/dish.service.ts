@@ -15,27 +15,18 @@ export class DishService {
 
   async create(dish: Dish): Promise<void> {
     await this.dishRepository.save(dish);
-    await this.createHistory(dish);
   }
 
   async update(dish: Dish): Promise<void> {
     await this.dishRepository.update(dish.id, dish);
-    await this.createHistory(dish);
   }
 
   async delete(id: string): Promise<void> {
-    const dish = await this.dishRepository.findOne({ id });
-    const history = await this.dishHistoryRepository.find({ name: dish?.name });
-    history.forEach(async (dish) => {
-      if (dish.orderedDishHistories.length === 0) {
-        await this.dishHistoryRepository.delete(dish);
-      }
-    });
     await this.dishRepository.delete(id);
   }
 
   async getById(id: string): Promise<Dish | undefined> {
-    return await this.dishRepository.findOne(id);
+    return await this.dishRepository.findOne({ where: { id }, relations: ['orderedDishes'] });
   }
 
   async getHistoryById(id: string): Promise<DishHistory | undefined> {
@@ -47,14 +38,6 @@ export class DishService {
   }
 
   verifyImageSize(photo: string, size: number): boolean {
-    return atob(photo).length <= size;
-  }
-
-  private async createHistory(dish: Dish): Promise<void> {
-    const dishHistory = new DishHistory();
-    dishHistory.name = dish.name;
-    dishHistory.cost = dish.cost;
-    dishHistory.description = dish.description;
-    await this.dishHistoryRepository.save(dishHistory);
+    return new Buffer(photo, 'base64').length <= size;
   }
 }

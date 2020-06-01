@@ -12,7 +12,7 @@ export class Category {
   @Column()
   name!: string;
 
-  @OneToMany(type => Dish, dish => dish.categoty)
+  @OneToMany(type => Dish, dish => dish.category)
   dishes!: Dish[];
 
 }

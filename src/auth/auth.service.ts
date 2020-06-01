@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException, BadRequestException, NotFoundException, ForbiddenException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '../entity/User';
@@ -8,9 +8,11 @@ import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
-  private readonly extraResetCodeMinutes: number = 5;
-  private readonly msMinutes: number = 60000;
+  public readonly extraResetCodeMinutes: number = 5;
+  public readonly msMinutes: number = 60000;
+
   private readonly resetCodeLength: number = 8;
+  private readonly hashRounds: number = 10;
 
   constructor(
     private userService: UserService,
@@ -19,22 +21,12 @@ export class AuthService {
   ) {}
 
   async register(user: User, role: Roles): Promise<void> {
-    if (!await this.userService.isLoginUnique(user.login)) {
-      throw new BadRequestException(`Логін ${user.login} вже зайнятий`);
-    }
-    if (!await this.userService.isEmailUnique(user.email)) {
-      throw new BadRequestException('Ця пошта вже зареєстрована');
-    }
     user.role = role;
-    user.password = await bcrypt.hash(user.password, 10);
+    user.password = await bcrypt.hash(user.password, this.hashRounds);
     await this.userService.create(user);
   }
 
-  async login(login: string, password: string): Promise<string> {
-    const user = await this.userService.getByLogin(login);
-    if (!user || !await user.comparePassword(password)) {
-      throw new UnauthorizedException('Неправильний логін або пароль');
-    }
+  async login(user: User): Promise<string> {
     const payload = { 
       id: user.id,
       login: user.login,
@@ -43,49 +35,19 @@ export class AuthService {
     return this.jwtService.sign(payload);
   }
 
-  async changePassword(user: User, oldPassword: string, newPassword: string): Promise<void> {
-    if (!await user.comparePassword(oldPassword)) {
-      throw new UnauthorizedException('Неправильний старий пароль');
-    }
+  async changePassword(user: User, newPassword: string): Promise<void> {
     await user.changePassword(newPassword);
     await this.userService.update(user);
   }
 
-  async requestResetPassword(email: string): Promise<void> {
-    const user = await this.userService.getByEmail(email);
-    if (!user) {
-      throw new NotFoundException();
-    }
+  async requestResetPassword(user: User): Promise<void> {
     const resetCode = this.generateResetCode();
     user.setResetCode(resetCode);
     await this.userService.update(user);
-    await this.emailService.sendEmailAsync(email, 'Відновлення паролю', user.login, resetCode);
+    await this.emailService.sendEmailAsync(user.email, 'Відновлення паролю', user.login, resetCode);
   }
 
-  async verifyResetCode(email: string, resetCode: string): Promise<void> {
-    const user = await this.userService.getByEmail(email);
-    if (!user) {
-      throw new NotFoundException();
-    }
-    if(user.resetCode !== resetCode) {
-      throw new ForbiddenException('Ви ввели невірний код');
-    }
-    if (user.lastResetCodeCreationTime
-      && new Date(user.lastResetCodeCreationTime.getTime() + this.extraResetCodeMinutes * this.msMinutes).getTime()
-      < new Date().getTime()) {
-      await this.userService.clearResetCode(user.id);
-      throw new ForbiddenException('Ваш код вже недійсний');
-    }
-  }
-
-  async resetPassword(newPassword: string, email: string, resetCode: string): Promise<void> {
-    const user = await this.userService.getByEmail(email);
-    if (!user) {
-      throw new NotFoundException();
-    }
-    if(user.resetCode !== resetCode) {
-      throw new ForbiddenException('Ви ввели невірний код');
-    }
+  async resetPassword(newPassword: string, user: User): Promise<void> {
     await user.changePassword(newPassword);
     await this.userService.update(user);
   }
@@ -94,7 +56,7 @@ export class AuthService {
     const result: string[] = [];
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     for (let i = 0; i < this.resetCodeLength; i++) {
-        result.push(characters.charAt(Math.floor(Math.random() * characters.length)));
+      result.push(characters.charAt(Math.floor(Math.random() * characters.length)));
     }
     return result.join('');
   }

@@ -11,6 +11,6 @@ export class OrderHistory {
   completionDate!: Date;
 
   @OneToMany(type => OrderedDishHistory, orderedDishHistory => orderedDishHistory.orderHistory)
-  orderedDishHistories!: OrderedDishHistory[]
+  orderedDishHistories!: OrderedDishHistory[];
 
 }
