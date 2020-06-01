@@ -6,6 +6,7 @@ import { User } from '../entity/User';
 import { Roles } from '../auth/roles';
 import { DishService } from '../dish/dish.service';
 import { ArchiveService } from '../archive/archive.service';
+import { UserService } from '../user/user.service';
 
 @Authorize()
 @Controller('order')
@@ -14,6 +15,7 @@ export class OrderController {
     private orderService: OrderService,
     private dishService: DishService,
     private archiveService: ArchiveService,
+    private userService: UserService,
   ) {}
 
   @Post('create')
@@ -106,7 +108,10 @@ export class OrderController {
 
   @ForRoles(Roles.Cook)
   @Post('confirmReadyStatus')
-  async confirmReadyStatus(@Body('id') id: string): Promise<void> {
+  async confirmReadyStatus(
+    @GetUser() user: User, 
+    @Body('id') id: string
+  ): Promise<void> {
     if (!id) {
       throw new BadRequestException();
     }
@@ -117,7 +122,13 @@ export class OrderController {
     if (!order.isPaid) {
       throw new ForbiddenException('Замовлення ще не оплачене');
     }
-    return await this.orderService.confirmReadyStatus(order);
+    await this.orderService.confirmReadyStatus(order);
+    this.userService.sendPushNotification(
+      user.pushToken as string, 
+      'Замовлення', 
+      `Ваше замовлення №${order.id} чекає на вас.`
+    );
+    return;
   }
 
   @Post('archive')

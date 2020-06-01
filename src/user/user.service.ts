@@ -2,9 +2,12 @@ import { Injectable } from '@nestjs/common';
 import { User } from '../entity/User';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import fetch from 'node-fetch';
 
 @Injectable()
 export class UserService {
+  private readonly pushNotificationsServiceUrl: string = 'https://exp.host/--/api/v2/push/send';
+
   constructor(
 		@InjectRepository(User)
 		private userRepository: Repository<User>
@@ -56,5 +59,21 @@ export class UserService {
   async clearResetCode(id: string): Promise<void> {
     const user = await this.userRepository.findOne(id);
     await this.userRepository.update(id, { ...user, resetCode: undefined });
+  }
+
+  sendPushNotification(pushToken: string, title: string, message: string): void {
+    if (!pushToken) {
+      return;
+    }
+    const data = {
+      to: pushToken,
+      title,
+      body: message,
+      sound: 'default',
+    }
+    fetch(this.pushNotificationsServiceUrl, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
   }
 }
