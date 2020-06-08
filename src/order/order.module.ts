@@ -7,7 +7,7 @@ import { OrderController } from './order.controller';
 import { DishModule } from '../dish/dish.module';
 import { OrderedDishModule } from '../orderedDish/ordered-dish.module';
 import { ArchiveModule } from '../archive/archive.module';
-import { UserModule } from 'src/user/user.module';
+import { UserModule } from '../user/user.module';
 
 @Module({
   imports: [

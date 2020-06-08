@@ -16,7 +16,7 @@ export class AuthController {
   async login(
     @Body('login') login: string, 
     @Body('password') password: string
-  ) {
+  ): Promise<{ authToken: string }> {
     if (!login || !password) {
       throw new BadRequestException();
     }
@@ -24,7 +24,7 @@ export class AuthController {
     if (!user || !await user.comparePassword(password)) {
       throw new UnauthorizedException('Неправильний логін або пароль');
     }
-    return await this.authService.login(user);
+    return { authToken: await this.authService.login(user) };
   }
 
   @Post('register')

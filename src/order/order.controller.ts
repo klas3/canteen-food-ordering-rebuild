@@ -147,7 +147,7 @@ export class OrderController {
     return await this.orderService.archive(order, orderHistory);
   }
 
-  @Get(':date')
+  @Get('getArchivedOrders/:date')
   async getArchivedOrders(@Param('date') date: string): Promise<{ 
     count: number, 
     name: string, 

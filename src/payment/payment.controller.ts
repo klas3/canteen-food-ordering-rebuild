@@ -1,7 +1,7 @@
 import { Controller, Param, Post, Body, ForbiddenException, NotFoundException, Get } from '@nestjs/common';
 import { OrderService } from '../order/order.service';
 import { PaymentService } from './payment.service';
-import { Authorize } from 'src/auth/auth.decorators';
+import { Authorize } from '../auth/auth.decorators';
 
 @Controller('payment')
 export class PaymentController {
@@ -11,7 +11,7 @@ export class PaymentController {
   ) {}
 
   @Authorize()
-  @Get('getPaymentData/:orderId')
+  @Get('getData/:orderId')
   async getPaymentData(@Param('orderId') id: string): Promise<{ data: string, signature: string }> {
     const order = await this.orderService.getById(id);
     if (!order) {
