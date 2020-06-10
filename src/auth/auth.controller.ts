@@ -30,7 +30,8 @@ export class AuthController {
   @Post('register')
   async register(@Body() user: User): Promise<void> {
     await this.verifyRegistration(user);
-    return await this.authService.register(user, Roles.Customer);
+    user.role = Roles.Customer;
+    return await this.authService.register(user);
   }
 
   @Post('registerWorker')
@@ -41,7 +42,7 @@ export class AuthController {
       throw new BadRequestException();
     }
     await this.verifyRegistration(user);
-    return await this.authService.register(user, user.role);
+    return await this.authService.register(user);
   }
 
   @Authorize()
@@ -110,7 +111,7 @@ export class AuthController {
     if (!user) {
       throw new NotFoundException();
     }
-    if(user.resetCode !== code) {
+    if (user.resetCode !== code) {
       throw new ForbiddenException('Ви ввели невірний код');
     }
     return await this.authService.resetPassword(newPassword, user);

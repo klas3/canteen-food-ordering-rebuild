@@ -3,6 +3,7 @@ import { User } from '../entity/User';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import fetch from 'node-fetch';
+import { Roles } from '../auth/roles';
 
 @Injectable()
 export class UserService {
@@ -59,6 +60,10 @@ export class UserService {
   async clearResetCode(id: string): Promise<void> {
     const user = await this.userRepository.findOne(id);
     await this.userRepository.update(id, { ...user, resetCode: undefined });
+  }
+
+  async isAdminExist(): Promise<boolean> {
+    return !!await this.userRepository.findOne({ role: Roles.Admin });
   }
 
   sendPushNotification(pushToken: string, title: string, message: string): void {
