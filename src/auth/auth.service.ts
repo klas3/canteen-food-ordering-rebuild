@@ -4,7 +4,6 @@ import { JwtService } from '@nestjs/jwt';
 import { User } from '../entity/User';
 import { EmailService } from '../email/email.service';
 import * as bcrypt from 'bcrypt';
-import { Roles } from './roles';
 
 @Injectable()
 export class AuthService {
@@ -18,9 +17,7 @@ export class AuthService {
     private userService: UserService,
     private jwtService: JwtService,
     private emailService: EmailService,
-  ) {
-    this.createAdmin();
-  }
+  ) {}
 
   async register(user: User): Promise<void> {
     user.password = await bcrypt.hash(user.password, this.hashRounds);
@@ -60,20 +57,5 @@ export class AuthService {
       result.push(characters.charAt(Math.floor(Math.random() * characters.length)));
     }
     return result.join('');
-  }
-
-  private async createAdmin(): Promise<void> {
-    if (await this.userService.isAdminExist()) {
-      return;
-    }
-    if (!process.env.ADMIN_LOGIN || !process.env.ADMIN_PASSWORD || !process.env.ADMIN_EMAIL) {
-      return;
-    }
-    const admin = new User();
-    admin.role = Roles.Admin;
-    admin.login = process.env.ADMIN_LOGIN;
-    admin.password = process.env.ADMIN_PASSWORD;
-    admin.email = process.env.ADMIN_EMAIL;
-    this.register(admin);
   }
 }

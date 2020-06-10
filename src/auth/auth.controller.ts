@@ -29,6 +29,7 @@ export class AuthController {
 
   @Post('register')
   async register(@Body() user: User): Promise<void> {
+    await this.ensureCreateAdmin();
     await this.verifyRegistration(user);
     user.role = Roles.Customer;
     return await this.authService.register(user);
@@ -124,5 +125,20 @@ export class AuthController {
     if (!await this.userService.isEmailUnique(user.email)) {
       throw new BadRequestException('Ця пошта вже зареєстрована');
     }
+  }
+
+  private async ensureCreateAdmin(): Promise<void> {
+    if (await this.userService.isAdminExist()) {
+      return;
+    }
+    if (!process.env.ADMIN_LOGIN || !process.env.ADMIN_PASSWORD || !process.env.ADMIN_EMAIL) {
+      return;
+    }
+    const admin = new User();
+    admin.role = Roles.Admin;
+    admin.login = process.env.ADMIN_LOGIN;
+    admin.password = process.env.ADMIN_PASSWORD;
+    admin.email = process.env.ADMIN_EMAIL;
+    return await this.authService.register(admin);
   }
 }
