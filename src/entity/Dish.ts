@@ -21,7 +21,7 @@ export class Dish {
   @Column()
   description!: string;
 
-  @Column({ type: 'blob' })
+  @Column({ type: 'mediumblob' })
   photo!: Buffer;
 
   @Column()
