@@ -38,6 +38,10 @@ export class DishService {
   }
 
   verifyImageSize(photo: string, size: number): boolean {
-    return new Buffer(photo, 'base64').length <= size;
+    return Buffer.from(photo, 'base64').length <= size;
+  }
+
+  convertImageFromBase64(photo: string): Buffer {
+    return Buffer.from(photo, 'base64');
   }
 }

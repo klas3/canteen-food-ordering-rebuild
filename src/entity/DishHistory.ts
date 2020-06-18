@@ -10,7 +10,7 @@ export class DishHistory {
   @Column()
   name!: string;
 
-  @Column()
+  @Column('float')
   cost!: number;
 
   @Column()

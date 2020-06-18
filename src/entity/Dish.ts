@@ -15,14 +15,14 @@ export class Dish {
   name!: string;
 
   @IsNotEmpty()
-  @Column()
+  @Column('float')
   cost!: number;
 
   @Column()
   description!: string;
 
-  @Column()
-  photo!: string;
+  @Column({ type: 'blob' })
+  photo!: Buffer;
 
   @Column()
   imageMimeType!: string;

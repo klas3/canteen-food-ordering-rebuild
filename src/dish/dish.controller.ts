@@ -14,13 +14,16 @@ export class DishController {
   constructor(
     private dishService: DishService,
     private archiveService: ArchiveService,
-    private categoryService: CategoryService
+    private categoryService: CategoryService,
   ) {}
 
   @ForRoles(Roles.Cook)
   @Post('create')
-  async create(@Body() dish: Dish): Promise<void> {
-    if (dish.photo && !this.dishService.verifyImageSize(dish.photo, this.maxImageSize)) {
+  async create(
+    @Body() dish: Dish,
+    @Body('photo') photo: string,
+  ): Promise<void> {
+    if (photo && !this.dishService.verifyImageSize(photo, this.maxImageSize)) {
       throw new BadRequestException('Розмір картинки завелекий. Максимально допустимий розмір: 400 КБ');
     }
     if (!await this.categoryService.getById(dish.categoryId)) {
@@ -28,14 +31,18 @@ export class DishController {
     }
     const dishHistory = await this.archiveService.createDishHistory(dish);
     dish.dishHistoryId = dishHistory.id;
+    dish.photo = this.dishService.convertImageFromBase64(photo);
     await this.dishService.create(dish);
     return;
   }
 
   @ForRoles(Roles.Cook)
   @Post('update')
-  async update(@Body() dish: Dish): Promise<void> {
-    if (dish.photo && !this.dishService.verifyImageSize(dish.photo, this.maxImageSize)) {
+  async update(
+    @Body() dish: Dish,
+    @Body('photo') photo: string,
+  ): Promise<void> {
+    if (photo && !this.dishService.verifyImageSize(photo, this.maxImageSize)) {
       throw new BadRequestException('Розмір картинки завелекий. Максимально допустимий розмір: 400 КБ');
     }
     const currentDish = await this.dishService.getById(dish.id);
@@ -45,6 +52,7 @@ export class DishController {
     await this.archiveService.deleteEmptyDishHistory(currentDish.dishHistoryId);
     const dishHistory = await this.archiveService.createDishHistory(dish);
     dish.dishHistoryId = dishHistory.id;
+    dish.photo = this.dishService.convertImageFromBase64(photo);
     await this.dishService.update(dish);
     return;
   }
