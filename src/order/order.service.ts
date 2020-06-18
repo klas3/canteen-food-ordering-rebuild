@@ -60,7 +60,7 @@ export class OrderService {
 
   async getForCashier(userId: string): Promise<Order[]> {
     return await this.orderRepository.find({ 
-      where: { userId, isPaid: false }, 
+      where: { userId, isPaid: false },
       relations: ['orderedDishes', 'orderedDishes.dish'],
     });
   }

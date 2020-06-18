@@ -93,7 +93,7 @@ export class OrderController {
     return orders;
   }
 
-  @ForRoles(Roles.Cook, Roles.Admin)
+  @ForRoles(Roles.Cash, Roles.Admin)
   @Post('confirmPayment')
   async confirmPayment(@Body('id') id: string): Promise<void> {
     if (!id) {
