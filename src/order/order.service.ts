@@ -31,14 +31,20 @@ export class OrderService {
   }
 
   async getByUserId(userId: string): Promise<Order[]> {
-    return await this.orderRepository.find({ where: { userId }, relations: ['orderedDishes'] });
+    return await this.orderRepository.find({
+      where: { userId }, 
+      relations: ['orderedDishes', 'orderedDishes.dish'],
+    });
   }
 
   async getById(id: string, withRelations?: boolean): Promise<Order | undefined> {
     if (!withRelations) {
       return await this.orderRepository.findOne(id);
     }
-    return await this.orderRepository.findOne({ where: { id }, relations: ['orderedDishes'] });
+    return await this.orderRepository.findOne({
+      where: { id },
+      relations: ['orderedDishes', 'orderedDishes.dish'],
+    });
   }
 
   async getAll(): Promise<Order[]> {
@@ -46,13 +52,16 @@ export class OrderService {
   }
 
   async getByPaymentStatus(isPaid: boolean): Promise<Order[]> {
-    return await this.orderRepository.find({ where: { isPaid }, relations: ['orderedDishes'] });
+    return await this.orderRepository.find({
+      where: { isPaid },
+      relations: ['orderedDishes', 'orderedDishes.dish'],
+    });
   }
 
   async getForCashier(userId: string): Promise<Order[]> {
     return await this.orderRepository.find({ 
       where: { userId, isPaid: false }, 
-      relations: ['orderedDishes'],
+      relations: ['orderedDishes', 'orderedDishes.dish'],
     });
   }
 
