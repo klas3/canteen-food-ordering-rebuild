@@ -33,7 +33,6 @@ export class CategoryController {
     return await this.categoryService.delete(id);
   }
 
-  @ForRoles(Roles.Cook)
   @Get('getAll')
   async getAll(): Promise<Category[]> {
     return await this.categoryService.getAll();
