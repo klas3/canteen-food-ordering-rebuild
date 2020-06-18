@@ -14,10 +14,12 @@ export class DishService {
   ) {}
 
   async create(dish: Dish): Promise<void> {
+    dish.photo = Buffer.from(dish.photo);
     await this.dishRepository.save(dish);
   }
 
   async update(dish: Dish): Promise<void> {
+    dish.photo = Buffer.from(dish.photo);
     await this.dishRepository.update(dish.id, dish);
   }
 
