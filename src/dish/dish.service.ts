@@ -36,12 +36,4 @@ export class DishService {
   async getAll(): Promise<Dish[]> {
     return await this.dishRepository.find();
   }
-
-  verifyImageSize(photo: string, size: number): boolean {
-    return Buffer.from(photo, 'base64').length <= size;
-  }
-
-  convertImageFromBase64(photo: string): Buffer {
-    return Buffer.from(photo, 'base64');
-  }
 }
