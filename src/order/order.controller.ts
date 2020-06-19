@@ -45,12 +45,12 @@ export class OrderController {
   @Post('delete')
   async delete(
     @GetUser() user: User,
-    @Body('id') id: string,
+    @Body('orderId') orderId: string,
   ): Promise<void> {
-    if (!id) {
+    if (!orderId) {
       throw new BadRequestException();
     }
-    const order = await this.orderService.getById(id, true);
+    const order = await this.orderService.getById(orderId, true);
     if (user.isInRole(Roles.Customer) && (order?.userId !== user.id || order.isPaid)) {
       throw new ForbiddenException();
     }
@@ -137,11 +137,11 @@ export class OrderController {
   }
 
   @Post('archive')
-  async archive(@Body('id') id: string): Promise<void> {
-    if (!id) {
+  async archive(@Body('orderId') orderId: string): Promise<void> {
+    if (!orderId) {
       throw new BadRequestException();
     }
-    const order = await this.orderService.getById(id, true);
+    const order = await this.orderService.getById(orderId, true);
     if (!order) {
       throw new NotFoundException();
     }
