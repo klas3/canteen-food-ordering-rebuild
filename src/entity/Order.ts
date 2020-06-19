@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne, BeforeInsert, OneToOne, JoinColumn } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne, OneToOne, JoinColumn } from "typeorm";
 import { OrderedDish } from './OrderedDish';
 import { User } from './User';
 import { IsNotEmpty } from "class-validator";
@@ -7,8 +7,8 @@ import { OrderHistory } from "./OrderHistory";
 @Entity()
 export class Order {
 
-  @PrimaryGeneratedColumn('uuid')
-  id!: string;
+  @PrimaryGeneratedColumn('increment')
+  id!: number;
 
   @Column()
   creationDate!: Date;

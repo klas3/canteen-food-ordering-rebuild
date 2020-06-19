@@ -18,7 +18,7 @@ export class OrderedDishService {
     await this.orderedDishRepository.delete(id);
   }
 
-  async getByOrderId(orderId: string): Promise<OrderedDish[]> {
+  async getByOrderId(orderId: number): Promise<OrderedDish[]> {
     return await this.orderedDishRepository.find({ orderId });
   }
 }

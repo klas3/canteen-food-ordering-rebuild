@@ -14,7 +14,7 @@ export class OrderedDish {
   dishCount!: number;
 
   @Column()
-  orderId!: string;
+  orderId!: number;
 
   @IsNotEmpty()
   @Column()
