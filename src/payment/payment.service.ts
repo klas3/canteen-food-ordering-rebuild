@@ -10,10 +10,10 @@ export class PaymentService {
       amount: order.totalSum.toString(),
       description: `Оплата замовлення №${order.id}`,
       version: "3",
-      orderId: order.id.toString(),
+      order_Id: order.id.toString(),
       currency: "UAH",
-      publicKey: process.env.PUBLIC_KEY,
-      serverUrl: `${process.env.PAYMENT_RESPONSE_URL}${order.id}`
+      public_key: process.env.PUBLIC_KEY,
+      server_url: `${process.env.PAYMENT_RESPONSE_URL}${order.id}`
     }
     return Buffer.from(JSON.stringify(data)).toString('base64');
   }
