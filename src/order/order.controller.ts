@@ -95,11 +95,11 @@ export class OrderController {
 
   @ForRoles(Roles.Cash, Roles.Admin)
   @Post('confirmPayment')
-  async confirmPayment(@Body('id') id: string): Promise<void> {
-    if (!id) {
+  async confirmPayment(@Body('orderId') orderId: string): Promise<void> {
+    if (!orderId) {
       throw new BadRequestException();
     }
-    const order = await this.orderService.getById(id);
+    const order = await this.orderService.getById(orderId);
     if (!order) {
       throw new NotFoundException();
     }
@@ -110,12 +110,12 @@ export class OrderController {
   @Post('confirmReadyStatus')
   async confirmReadyStatus(
     @GetUser() user: User, 
-    @Body('id') id: string
+    @Body('orderId') orderId: string
   ): Promise<void> {
-    if (!id) {
+    if (!orderId) {
       throw new BadRequestException();
     }
-    const order = await this.orderService.getById(id);
+    const order = await this.orderService.getById(orderId);
     if (!order) {
       throw new NotFoundException();
     }
