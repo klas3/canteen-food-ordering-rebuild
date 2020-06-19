@@ -20,7 +20,7 @@ export class Order {
   @Column()
   wishes!: string;
 
-  @Column()
+  @Column('float')
   totalSum!: number;
 
   @Column()
