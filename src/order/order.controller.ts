@@ -79,10 +79,10 @@ export class OrderController {
   async getAll(@GetUser() user: User): Promise<Order[]> {
     let orders: Order[] = [];
     if (user.isInRole(Roles.Admin)) {
-      orders = await this.orderService.getByPaymentStatus(true);
+      orders = await this.orderService.getByPaymentStatus(false);
     }
     if (user.isInRole(Roles.Cook)) {
-      orders = await this.orderService.getByPaymentStatus(false);
+      orders = await this.orderService.getByPaymentStatus(true);
     }
     if (user.isInRole(Roles.Cash)) {
       orders = await this.orderService.getForCashier(user.id);
@@ -90,6 +90,11 @@ export class OrderController {
     if (user.isInRole(Roles.Customer)) {
       orders = await this.orderService.getByUserId(user.id);
     }
+    orders.forEach((order) => {
+      order.orderedDishes.forEach((orderedDish) => {
+        orderedDish.dish.photo = Buffer.from('');
+      });
+    });
     return orders;
   }
 
