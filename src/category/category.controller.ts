@@ -15,7 +15,8 @@ export class CategoryController {
     if (!await this.categoryService.isNameUnique(category.name)) {
       throw new BadRequestException('Категорія з даним ім\'ям вже існує.');
     }
-    return await this.categoryService.create(category);
+    await this.categoryService.create(category);
+    return;
   }
 
   @ForRoles(Roles.Cook)

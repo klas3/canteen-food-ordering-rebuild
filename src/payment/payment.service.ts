@@ -19,7 +19,7 @@ export class PaymentService {
   }
 
   async getSignature(data: string): Promise<string> {
-    const signature = `${process.env.PRIVATE_KEY}${data}${process.env.PRIVATE_KEY}`
+    const signature = `${process.env.PRIVATE_KEY}${data}${process.env.PRIVATE_KEY}`;
     return Buffer.from(crypto.SHA1(signature).toString()).toString('base64');
   }
 }

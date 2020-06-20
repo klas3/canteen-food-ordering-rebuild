@@ -10,8 +10,8 @@ export class CategoryService {
     private categoryRepository: Repository<Category>
   ) {}
 
-  async create(category: Category): Promise<void> {
-    await this.categoryRepository.save(category);
+  async create(category: Category): Promise<Category> {
+    return await this.categoryRepository.save(category);
   }
 
   async update(category: Category): Promise<void> {

@@ -7,6 +7,7 @@ import { Roles } from '../auth/roles';
 import { DishService } from '../dish/dish.service';
 import { ArchiveService } from '../archive/archive.service';
 import { UserService } from '../user/user.service';
+import { AppGateway } from 'src/app/app.gateway';
 
 @Authorize()
 @Controller('order')
@@ -16,9 +17,11 @@ export class OrderController {
     private dishService: DishService,
     private archiveService: ArchiveService,
     private userService: UserService,
+    private appGateway: AppGateway,
   ) {}
 
   @Post('create')
+  @ForRoles(Roles.Customer, Roles.Cash, Roles.Admin)
   async create(
     @GetUser() user: User,
     @Body() order: Order
@@ -39,13 +42,17 @@ export class OrderController {
       order.totalSum += dish.cost * orderedDish.dishCount;
     }
     order.orderHistoryId = (await this.archiveService.createOrderHistory(order)).id;
-    return await this.orderService.create(order);
+    const createdOrder = await this.orderService.create(order);
+    if (user.isInRole(Roles.Cash)) {
+      this.appGateway.addOrderToCash(createdOrder);
+    }
+    return;
   }
 
   @Post('delete')
   async delete(
     @GetUser() user: User,
-    @Body('orderId') orderId: string,
+    @Body('orderId') orderId: number,
   ): Promise<void> {
     if (!orderId) {
       throw new BadRequestException();
@@ -60,13 +67,16 @@ export class OrderController {
     }
     await this.orderService.delete(order as Order);
     await this.archiveService.deleteOrderHistory(orderHistory);
+    if (user.isInRole(Roles.Cook)) {
+      this.appGateway.removeOrderFromCook(orderId);
+    }
     return;
   }
 
   @Get('getById')
   async getById(
     @GetUser() user: User,
-    @Body('id') id: string,
+    @Body('id') id: number,
   ): Promise<Order> {
     const order = await this.orderService.getById(id, true);
     if (order?.userId !== user.id) {
@@ -100,7 +110,7 @@ export class OrderController {
 
   @ForRoles(Roles.Cash, Roles.Admin)
   @Post('confirmPayment')
-  async confirmPayment(@Body('orderId') orderId: string): Promise<void> {
+  async confirmPayment(@Body('orderId') orderId: number): Promise<void> {
     if (!orderId) {
       throw new BadRequestException();
     }
@@ -108,14 +118,16 @@ export class OrderController {
     if (!order) {
       throw new NotFoundException();
     }
-    return await this.orderService.confirmPayment(order);
+    await this.orderService.confirmPayment(order);
+    this.appGateway.addOrderToCook(order);
+    return;
   }
 
   @ForRoles(Roles.Cook)
   @Post('confirmReadyStatus')
   async confirmReadyStatus(
     @GetUser() user: User, 
-    @Body('orderId') orderId: string
+    @Body('orderId') orderId: number,
   ): Promise<void> {
     if (!orderId) {
       throw new BadRequestException();
@@ -133,11 +145,13 @@ export class OrderController {
       'Замовлення', 
       `Ваше замовлення №${order.id} чекає на вас.`
     );
+    this.appGateway.setOrderToReady(orderId);
     return;
   }
 
+  @ForRoles(Roles.Cook)
   @Post('archive')
-  async archive(@Body('orderId') orderId: string): Promise<void> {
+  async archive(@Body('orderId') orderId: number): Promise<void> {
     if (!orderId) {
       throw new BadRequestException();
     }
@@ -149,9 +163,12 @@ export class OrderController {
     if (!orderHistory) {
       throw new NotFoundException();
     }
-    return await this.orderService.archive(order, orderHistory);
+    await this.orderService.archive(order, orderHistory);
+    this.appGateway.removeOrderFromCook(orderId);
+    return;
   }
 
+  @ForRoles(Roles.Admin)
   @Get('getArchivedOrders/:date')
   async getArchivedOrders(@Param('date') date: string): Promise<{ 
     count: number, 

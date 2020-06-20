@@ -13,9 +13,9 @@ export class DishService {
     private dishHistoryRepository: Repository<DishHistory>
   ) {}
 
-  async create(dish: Dish): Promise<void> {
+  async create(dish: Dish): Promise<Dish> {
     dish.photo = Buffer.from(dish.photo);
-    await this.dishRepository.save(dish);
+    return await this.dishRepository.save(dish);
   }
 
   async update(dish: Dish): Promise<void> {

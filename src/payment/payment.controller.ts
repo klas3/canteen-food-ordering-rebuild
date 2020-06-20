@@ -12,7 +12,7 @@ export class PaymentController {
 
   @Authorize()
   @Get('getData/:orderId')
-  async getPaymentData(@Param('orderId') id: string): Promise<{ data: string, signature: string }> {
+  async getPaymentData(@Param('orderId') id: number): Promise<{ data: string, signature: string }> {
     const order = await this.orderService.getById(id);
     if (!order) {
       throw new NotFoundException();
@@ -26,7 +26,7 @@ export class PaymentController {
 
   @Post('payForOrder/:orderId')
   async pay(
-    @Param('orderId') id: string,
+    @Param('orderId') id: number,
     @Body('signature') signature: string,
     @Body('data') data: string,
   ): Promise<void> {

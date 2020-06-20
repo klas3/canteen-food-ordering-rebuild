@@ -10,8 +10,8 @@ export class OrderedDishService {
     private orderedDishRepository: Repository<OrderedDish>,
   ) {}
 
-  async create(orderedDish: OrderedDish): Promise<void> {
-    await this.orderedDishRepository.save(orderedDish);
+  async create(orderedDish: OrderedDish): Promise<OrderedDish> {
+    return await this.orderedDishRepository.save(orderedDish);
   }
 
   async delete(id: string): Promise<void> {

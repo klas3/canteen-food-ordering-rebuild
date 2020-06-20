@@ -15,12 +15,13 @@ export class OrderService {
     private orderedDishService: OrderedDishService,
   ) {}
 
-  async create(order: Order): Promise<void> {
-    const { id } = await this.orderRepository.save(order);
+  async create(order: Order): Promise<Order> {
+    order = await this.orderRepository.save(order);
     for (const orderedDish of order.orderedDishes) {
-      orderedDish.orderId = id;
+      orderedDish.orderId = order.id;
       await this.orderedDishService.create(orderedDish);
     }
+    return order;
   }
 
   async delete(order: Order): Promise<void> {
@@ -37,7 +38,7 @@ export class OrderService {
     });
   }
 
-  async getById(id: string, withRelations?: boolean): Promise<Order | undefined> {
+  async getById(id: number, withRelations?: boolean): Promise<Order | undefined> {
     if (!withRelations) {
       return await this.orderRepository.findOne(id);
     }

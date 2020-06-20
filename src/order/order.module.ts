@@ -8,6 +8,7 @@ import { DishModule } from '../dish/dish.module';
 import { OrderedDishModule } from '../orderedDish/ordered-dish.module';
 import { ArchiveModule } from '../archive/archive.module';
 import { UserModule } from '../user/user.module';
+import { AppGateway } from 'src/app/app.gateway';
 
 @Module({
   imports: [
@@ -15,9 +16,9 @@ import { UserModule } from '../user/user.module';
     DishModule, 
     OrderedDishModule, 
     ArchiveModule, 
-    UserModule
+    UserModule,
   ],
-  providers: [OrderService],
+  providers: [OrderService, AppGateway],
   exports: [OrderService],
   controllers: [OrderController],
 })

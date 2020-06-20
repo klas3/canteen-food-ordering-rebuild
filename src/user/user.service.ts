@@ -14,8 +14,8 @@ export class UserService {
 		private userRepository: Repository<User>
 	) {}
 
-  async create(user: User): Promise<void> {
-    await this.userRepository.save(user);
+  async create(user: User): Promise<User> {
+    return await this.userRepository.save(user);
   }
 
   async update(user: User): Promise<void> {
