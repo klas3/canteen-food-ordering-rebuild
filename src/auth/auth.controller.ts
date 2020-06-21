@@ -8,8 +8,8 @@ import { UserService } from '../user/user.service';
 @Controller('auth')
 export class AuthController {
   constructor(
-    private authService: AuthService,
-    private userService: UserService,
+    private readonly authService: AuthService,
+    private readonly userService: UserService,
   ) {}
 
   @Post('login')

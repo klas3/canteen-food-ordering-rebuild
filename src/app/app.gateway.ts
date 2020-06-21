@@ -4,7 +4,7 @@ import { Order } from 'src/entity/Order';
 @WebSocketGateway()
 export class AppGateway implements OnGatewayConnection {
   @WebSocketServer()
-  private server: any;
+  private readonly server: any;
 
   handleConnection(client: any): void {
     client.emit('connection');

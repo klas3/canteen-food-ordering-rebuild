@@ -12,11 +12,11 @@ import { Order } from '../entity/Order';
 export class ArchiveService {
   constructor(
     @InjectRepository(OrderHistory)
-    private orderHistoryRepository: Repository<OrderHistory>,
+    private readonly orderHistoryRepository: Repository<OrderHistory>,
     @InjectRepository(DishHistory)
-    private dishHistoryRepository: Repository<DishHistory>,
+    private readonly dishHistoryRepository: Repository<DishHistory>,
     @InjectRepository(OrderedDishHistory)
-    private orderedDishHistoryRepository: Repository<OrderedDishHistory>,
+    private readonly orderedDishHistoryRepository: Repository<OrderedDishHistory>,
   ) {}
 
   async createDishHistory(dish: Dish): Promise<DishHistory> {

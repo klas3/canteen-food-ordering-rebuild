@@ -8,9 +8,9 @@ import { DishHistory } from '../entity/DishHistory';
 export class DishService {
   constructor(
     @InjectRepository(Dish)
-    private dishRepository: Repository<Dish>,
+    private readonly dishRepository: Repository<Dish>,
     @InjectRepository(DishHistory)
-    private dishHistoryRepository: Repository<DishHistory>
+    private readonly dishHistoryRepository: Repository<DishHistory>
   ) {}
 
   async create(dish: Dish): Promise<Dish> {

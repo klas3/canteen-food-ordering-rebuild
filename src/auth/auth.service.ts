@@ -14,9 +14,9 @@ export class AuthService {
   private readonly hashRounds: number = 10;
 
   constructor(
-    private userService: UserService,
-    private jwtService: JwtService,
-    private emailService: EmailService,
+    private readonly userService: UserService,
+    private readonly jwtService: JwtService,
+    private readonly emailService: EmailService,
   ) {}
 
   async register(user: User): Promise<void> {

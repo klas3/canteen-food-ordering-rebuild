@@ -7,7 +7,7 @@ import { User } from '../entity/User';
 @Authorize()
 @Controller('user')
 export class UserController {
-  constructor(private userService: UserService) {}
+  constructor(private readonly userService: UserService) {}
 
   @Get('role')
   async getRole(@GetUser() user: User): Promise<{ role: Roles }> {

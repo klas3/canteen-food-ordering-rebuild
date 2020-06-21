@@ -9,10 +9,10 @@ import { OrderedDishService } from '../orderedDish/ordered-dish.service';
 export class OrderService {
   constructor(
     @InjectRepository(Order)
-    private orderRepository: Repository<Order>,
+    private readonly orderRepository: Repository<Order>,
     @InjectRepository(OrderHistory)
-    private orderHistoryRepository: Repository<OrderHistory>,
-    private orderedDishService: OrderedDishService,
+    private readonly orderHistoryRepository: Repository<OrderHistory>,
+    private readonly orderedDishService: OrderedDishService,
   ) {}
 
   async create(order: Order): Promise<Order> {

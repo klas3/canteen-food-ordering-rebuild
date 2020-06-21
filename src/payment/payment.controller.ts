@@ -6,8 +6,8 @@ import { Authorize } from '../auth/auth.decorators';
 @Controller('payment')
 export class PaymentController {
   constructor(
-    private orderService: OrderService,
-    private paymentService: PaymentService,
+    private readonly orderService: OrderService,
+    private readonly paymentService: PaymentService,
   ) {}
 
   @Authorize()

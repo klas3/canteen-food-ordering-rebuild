@@ -7,7 +7,7 @@ import { Roles } from '../auth/roles';
 @Authorize()
 @Controller('category')
 export class CategoryController {
-  constructor(private categoryService: CategoryService) {}
+  constructor(private readonly categoryService: CategoryService) {}
 
   @ForRoles(Roles.Cook)
   @Post('create')

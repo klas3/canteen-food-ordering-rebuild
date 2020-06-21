@@ -15,11 +15,11 @@ export class OrderController {
   private readonly countOfDigitsAfterInteger: number = 2;
 
   constructor(
-    private orderService: OrderService,
-    private dishService: DishService,
-    private archiveService: ArchiveService,
-    private userService: UserService,
-    private appGateway: AppGateway,
+    private readonly orderService: OrderService,
+    private readonly dishService: DishService,
+    private readonly archiveService: ArchiveService,
+    private readonly userService: UserService,
+    private readonly appGateway: AppGateway,
   ) {}
 
   @Post('create')

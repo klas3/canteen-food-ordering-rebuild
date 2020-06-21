@@ -7,7 +7,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 export class OrderedDishService {
   constructor(
     @InjectRepository(OrderedDish)
-    private orderedDishRepository: Repository<OrderedDish>,
+    private readonly orderedDishRepository: Repository<OrderedDish>,
   ) {}
 
   async create(orderedDish: OrderedDish): Promise<OrderedDish> {

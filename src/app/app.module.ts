@@ -1,7 +1,5 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { UserModule } from '../user/user.module';
 import { AuthModule } from '../auth/auth.module';
 import { OrderedDishModule } from '../orderedDish/ordered-dish.module';
@@ -22,8 +20,6 @@ import { PaymentModule } from '../payment/payment.module';
     DishModule, 
     ArchiveModule, 
     PaymentModule
-  ],
-  controllers: [AppController],
-  providers: [AppService],
+  ]
 })
 export class AppModule {}

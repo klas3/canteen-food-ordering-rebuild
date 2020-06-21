@@ -5,19 +5,15 @@ import * as fs from 'fs';
 
 @Injectable()
 export class EmailService {
-  private transporter: Mail;
+  private readonly transporter: Mail;
 
   constructor() {
     this.transporter = createTransport({
       service: 'gmail',
       auth: {
         user: process.env.EMAIL,
-        pass: process.env.EMAIL_PASSWORD
+        pass: process.env.EMAIL_PASSWORD,
       }
-    });
-    console.log({
-      user: process.env.EMAIL,
-      pass: process.env.EMAIL_PASSWORD
     });
   }
 
@@ -32,8 +28,9 @@ export class EmailService {
 
   private getHtml(username: string, message: string): string {
     let html = fs.readFileSync(`./shared/email-recovery-code-template.html`, { encoding: 'utf8' });
-    html = html.replace('{username}', username);
-    html = html.replace('{message}', message);
+    html = html
+      .replace('{username}', username)
+      .replace('{message}', message);
     return html;
   }
 }

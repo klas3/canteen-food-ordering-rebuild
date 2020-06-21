@@ -13,9 +13,9 @@ export class DishController {
   private readonly countOfDigitsAfterInteger: number = 2;
 
   constructor(
-    private dishService: DishService,
-    private archiveService: ArchiveService,
-    private categoryService: CategoryService,
+    private readonly dishService: DishService,
+    private readonly archiveService: ArchiveService,
+    private readonly categoryService: CategoryService,
   ) {}
 
   @ForRoles(Roles.Cook)
