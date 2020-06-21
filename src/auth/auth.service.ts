@@ -47,6 +47,7 @@ export class AuthService {
 
   async resetPassword(newPassword: string, user: User): Promise<void> {
     await user.changePassword(newPassword);
+    user.setResetCode(undefined);
     await this.userService.update(user);
   }
 

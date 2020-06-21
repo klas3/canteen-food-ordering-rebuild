@@ -15,6 +15,10 @@ export class EmailService {
         pass: process.env.EMAIL_PASSWORD
       }
     });
+    console.log({
+      user: process.env.EMAIL,
+      pass: process.env.EMAIL_PASSWORD
+    });
   }
 
   async sendEmailAsync(receiver: string, subject: string, username: string, message: string): Promise<void> {

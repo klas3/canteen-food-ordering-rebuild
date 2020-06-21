@@ -45,9 +45,13 @@ export class User {
     return await bcrypt.compare(password, this.password);
   }
 
-  setResetCode(code: string): void {
+  setResetCode(code: string | undefined): void {
+    if (code) {
+      this.lastResetCodeCreationTime = new Date();
+    } else {
+      this.lastResetCodeCreationTime = undefined;
+    }
     this.resetCode = code;
-    this.lastResetCodeCreationTime = new Date();
   }
 
   isInRole(role: Roles) {
