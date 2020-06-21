@@ -12,6 +12,8 @@ import { AppGateway } from 'src/app/app.gateway';
 @Authorize()
 @Controller('order')
 export class OrderController {
+  private readonly countOfDigitsAfterInteger: number = 2;
+
   constructor(
     private orderService: OrderService,
     private dishService: DishService,
@@ -41,6 +43,7 @@ export class OrderController {
       orderedDish.dish = dish;
       order.totalSum += dish.cost * orderedDish.dishCount;
     }
+    order.totalSum = parseFloat(order.totalSum.toFixed(this.countOfDigitsAfterInteger));
     order.orderHistoryId = (await this.archiveService.createOrderHistory(order)).id;
     const createdOrder = await this.orderService.create(order);
     if (user.isInRole(Roles.Cash)) {

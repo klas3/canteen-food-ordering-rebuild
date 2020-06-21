@@ -10,6 +10,7 @@ import { CategoryService } from '../category/category.service';
 @Controller('dish')
 export class DishController {
   private readonly maxImageSize: number = 400 * 1024;
+  private readonly countOfDigitsAfterInteger: number = 2;
 
   constructor(
     private dishService: DishService,
@@ -20,14 +21,10 @@ export class DishController {
   @ForRoles(Roles.Cook)
   @Post('create')
   async create(@Body() dish: Dish): Promise<void> {
-    if (dish.photo && dish.photo.length > this.maxImageSize) {
-      throw new BadRequestException('Розмір картинки завелекий. Максимально допустимий розмір: 400 КБ');
-    }
-    if (!await this.categoryService.getById(dish.categoryId)) {
-      throw new NotFoundException();
-    }
+    await this.validateDish(dish);
     const dishHistory = await this.archiveService.createDishHistory(dish);
     dish.dishHistoryId = dishHistory.id;
+    dish.cost = parseFloat(dish.cost.toFixed(this.countOfDigitsAfterInteger));
     await this.dishService.create(dish);
     return;
   }
@@ -35,16 +32,15 @@ export class DishController {
   @ForRoles(Roles.Cook)
   @Post('update')
   async update(@Body() dish: Dish): Promise<void> {
-    if (dish.photo && dish.photo.length > this.maxImageSize) {
-      throw new BadRequestException('Розмір картинки завелекий. Максимально допустимий розмір: 400 КБ');
-    }
+    await this.validateDish(dish);
     const currentDish = await this.dishService.getById(dish.id);
-    if (!dish.id || !currentDish) {
+    if (!currentDish) {
       throw new BadRequestException();
     }
     await this.archiveService.deleteEmptyDishHistory(currentDish.dishHistoryId);
     const dishHistory = await this.archiveService.createDishHistory(dish);
     dish.dishHistoryId = dishHistory.id;
+    dish.cost = parseFloat(dish.cost.toFixed(this.countOfDigitsAfterInteger));
     await this.dishService.update(dish);
     return;
   }
@@ -67,5 +63,14 @@ export class DishController {
   @Get('getAll')
   async getAll(): Promise<Dish[]> {
     return await this.dishService.getAll();
+  }
+
+  private async validateDish(dish: Dish): Promise<void> {
+    if (dish.photo && dish.photo.length > this.maxImageSize) {
+      throw new BadRequestException('Розмір картинки завелекий. Максимально допустимий розмір: 400 КБ');
+    }
+    if (!await this.categoryService.getById(dish.categoryId)) {
+      throw new NotFoundException();
+    }
   }
 }
