@@ -1,12 +1,12 @@
 import { Controller, Get } from '@nestjs/common';
-import { UserService } from './user.service';
-import { Roles } from '../auth/roles';
+import UserService from './user.service';
+import Roles from '../auth/roles';
 import { Authorize, GetUser } from '../auth/auth.decorators';
-import { User } from '../entity/User';
+import User from '../entity/User';
 
 @Authorize()
 @Controller('user')
-export class UserController {
+class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get('role')
@@ -26,6 +26,9 @@ export class UserController {
 
   @Get('checkForAuthorization')
   async CheckIfUserAlreadyAuthorized(): Promise<void> {
+    // eslint-disable-next-line no-useless-return
     return;
   }
 }
+
+export default UserController;

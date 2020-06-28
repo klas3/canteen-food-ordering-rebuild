@@ -1,16 +1,18 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
-import { OrderedDishHistory } from "./OrderedDishHistory";
+import {
+  Entity, PrimaryGeneratedColumn, Column, OneToMany,
+} from 'typeorm';
+import OrderedDishHistory from './OrderedDishHistory';
 
 @Entity()
-export class OrderHistory {
-
+class OrderHistory {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
   @Column()
   completionDate!: Date;
 
-  @OneToMany(type => OrderedDishHistory, orderedDishHistory => orderedDishHistory.orderHistory)
+  @OneToMany((type) => OrderedDishHistory, (orderedDishHistory) => orderedDishHistory.orderHistory)
   orderedDishHistories!: OrderedDishHistory[];
-
 }
+
+export default OrderHistory;

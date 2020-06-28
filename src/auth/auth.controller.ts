@@ -1,12 +1,15 @@
-import { Controller, Post, Body, BadRequestException, NotFoundException, ForbiddenException, UnauthorizedException } from '@nestjs/common';
-import { User } from '../entity/User';
-import { AuthService } from './auth.service';
-import { Roles } from './roles';
+import {
+  Controller, Post, Body, BadRequestException, NotFoundException,
+  ForbiddenException, UnauthorizedException,
+} from '@nestjs/common';
+import User from '../entity/User';
+import AuthService from './auth.service';
+import Roles from './roles';
 import { Authorize, GetUser, ForRoles } from './auth.decorators';
-import { UserService } from '../user/user.service';
+import UserService from '../user/user.service';
 
 @Controller('auth')
-export class AuthController {
+class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly userService: UserService,
@@ -14,7 +17,7 @@ export class AuthController {
 
   @Post('login')
   async login(
-    @Body('login') login: string, 
+    @Body('login') login: string,
     @Body('password') password: string,
     @Body('pushToken') pushToken: string,
   ): Promise<{ authToken: string }> {
@@ -30,11 +33,12 @@ export class AuthController {
   }
 
   @Post('register')
-  async register(@Body() user: User): Promise<void> {
+  async register(@Body() incomingUser: User): Promise<void> {
+    const user = incomingUser;
     await this.ensureCreateAdmin();
     await this.verifyRegistration(user);
     user.role = Roles.Customer;
-    return await this.authService.register(user);
+    return this.authService.register(user);
   }
 
   @Post('registerWorker')
@@ -45,7 +49,7 @@ export class AuthController {
       throw new BadRequestException();
     }
     await this.verifyRegistration(user);
-    return await this.authService.register(user);
+    return this.authService.register(user);
   }
 
   @Authorize()
@@ -53,15 +57,15 @@ export class AuthController {
   async changePassword(
     @GetUser() user: User,
     @Body('oldPassword') oldPassword: string,
-    @Body('newPassword') newPassword: string
+    @Body('newPassword') newPassword: string,
   ): Promise<void> {
-    if(!oldPassword || !newPassword) {
+    if (!oldPassword || !newPassword) {
       throw new BadRequestException();
     }
     if (!await user.comparePassword(oldPassword)) {
       throw new UnauthorizedException('Неправильний старий пароль');
     }
-    return await this.authService.changePassword(user, newPassword);
+    return this.authService.changePassword(user, newPassword);
   }
 
   @Post('requestResetPassword')
@@ -73,13 +77,13 @@ export class AuthController {
     if (!user) {
       throw new NotFoundException();
     }
-    return await this.authService.requestResetPassword(user);
+    return this.authService.requestResetPassword(user);
   }
 
   @Post('verifyResetCode')
   async verifyResetCode(
     @Body('email') email: string,
-    @Body('code') code: string
+    @Body('code') code: string,
   ): Promise<void> {
     if (!email || !code) {
       throw new BadRequestException();
@@ -88,24 +92,23 @@ export class AuthController {
     if (!user) {
       throw new NotFoundException();
     }
-    if(user.resetCode !== code) {
+    if (user.resetCode !== code) {
       throw new ForbiddenException('Ви ввели невірний код');
     }
     if (user.lastResetCodeCreationTime
-      && new Date(user.lastResetCodeCreationTime.getTime() 
+      && new Date(user.lastResetCodeCreationTime.getTime()
       + this.authService.extraResetCodeMinutes * this.authService.msMinutes).getTime()
       < new Date().getTime()) {
       await this.userService.clearResetCode(user.id);
       throw new ForbiddenException('Ваш код вже недійсний');
     }
-    return;
   }
 
   @Post('resetPassword')
   async resetPassword(
     @Body('email') email: string,
     @Body('code') code: string,
-    @Body('newPassword') newPassword: string
+    @Body('newPassword') newPassword: string,
   ): Promise<void> {
     if (!email || !code || !newPassword) {
       throw new BadRequestException();
@@ -117,7 +120,7 @@ export class AuthController {
     if (user.resetCode !== code) {
       throw new ForbiddenException('Ви ввели невірний код');
     }
-    return await this.authService.resetPassword(newPassword, user);
+    return this.authService.resetPassword(newPassword, user);
   }
 
   private async verifyRegistration(user: User): Promise<void> {
@@ -141,6 +144,8 @@ export class AuthController {
     admin.login = process.env.ADMIN_LOGIN;
     admin.password = process.env.ADMIN_PASSWORD;
     admin.email = process.env.ADMIN_EMAIL;
-    return await this.authService.register(admin);
+    await this.authService.register(admin);
   }
 }
+
+export default AuthController;

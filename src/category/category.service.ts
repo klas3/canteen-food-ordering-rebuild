@@ -1,17 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
-import { Category } from '../entity/Category';
 import { InjectRepository } from '@nestjs/typeorm';
+import Category from '../entity/Category';
 
 @Injectable()
-export class CategoryService {
+class CategoryService {
   constructor(
     @InjectRepository(Category)
-    private readonly categoryRepository: Repository<Category>
+    private readonly categoryRepository: Repository<Category>,
   ) {}
 
   async create(category: Category): Promise<Category> {
-    return await this.categoryRepository.save(category);
+    return this.categoryRepository.save(category);
   }
 
   async update(category: Category): Promise<void> {
@@ -23,14 +23,16 @@ export class CategoryService {
   }
 
   async getById(id: string): Promise<Category | undefined> {
-    return await this.categoryRepository.findOne(id);
+    return this.categoryRepository.findOne(id);
   }
 
   async getAll(): Promise<Category[]> {
-    return await this.categoryRepository.find();
+    return this.categoryRepository.find();
   }
 
   async isNameUnique(name: string): Promise<boolean> {
     return await this.categoryRepository.findOne({ name }) === undefined;
   }
 }
+
+export default CategoryService;

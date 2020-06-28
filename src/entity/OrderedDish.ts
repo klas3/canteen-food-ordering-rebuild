@@ -1,11 +1,12 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm";
-import { Order } from "./Order";
-import { Dish } from "./Dish";
-import { IsNotEmpty } from "class-validator";
+import {
+  Entity, PrimaryGeneratedColumn, Column, ManyToOne,
+} from 'typeorm';
+import { IsNotEmpty } from 'class-validator';
+import Order from './Order';
+import Dish from './Dish';
 
 @Entity()
-export class OrderedDish {
-
+class OrderedDish {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
@@ -20,10 +21,11 @@ export class OrderedDish {
   @Column()
   dishId!: string;
 
-  @ManyToOne(type => Order, order => order.orderedDishes)
+  @ManyToOne((type) => Order, (order) => order.orderedDishes)
   order!: Order;
 
-  @ManyToOne(type => Dish, dish => dish.orderedDishes)
+  @ManyToOne((type) => Dish, (dish) => dish.orderedDishes)
   dish!: Dish;
-
 }
+
+export default OrderedDish;

@@ -1,17 +1,19 @@
-import { Controller, Post, Body, BadRequestException, ForbiddenException, Get, NotFoundException, Param } from '@nestjs/common';
-import { OrderService } from './order.service';
-import { Order } from '../entity/Order';
+import {
+  Controller, Post, Body, BadRequestException, ForbiddenException, Get, NotFoundException, Param,
+} from '@nestjs/common';
+import AppGateway from '../app/app.gateway';
+import OrderService from './order.service';
+import Order from '../entity/Order';
 import { GetUser, Authorize, ForRoles } from '../auth/auth.decorators';
-import { User } from '../entity/User';
-import { Roles } from '../auth/roles';
-import { DishService } from '../dish/dish.service';
-import { ArchiveService } from '../archive/archive.service';
-import { UserService } from '../user/user.service';
-import { AppGateway } from 'src/app/app.gateway';
+import User from '../entity/User';
+import Roles from '../auth/roles';
+import DishService from '../dish/dish.service';
+import ArchiveService from '../archive/archive.service';
+import UserService from '../user/user.service';
 
 @Authorize()
 @Controller('order')
-export class OrderController {
+class OrderController {
   private readonly countOfDigitsAfterInteger: number = 2;
 
   constructor(
@@ -26,8 +28,9 @@ export class OrderController {
   @ForRoles(Roles.Customer, Roles.Cash, Roles.Admin)
   async create(
     @GetUser() user: User,
-    @Body() order: Order
+    @Body() incomingOrder: Order,
   ): Promise<void> {
+    const order = incomingOrder;
     order.userId = user.id;
     order.creationDate = new Date();
     order.desiredDate = new Date(order.desiredDate);
@@ -35,21 +38,28 @@ export class OrderController {
     if (order.creationDate > order.desiredDate) {
       throw new BadRequestException('Бажана дата видачі повинна бути пізнішою, ніж дата створення');
     }
-    for (const orderedDish of order.orderedDishes) {
-      const dish = await this.dishService.getById(orderedDish.dishId);
-      if (!dish) {
+    const searchDishes = order.orderedDishes.map(
+      (orderedDish) => this.dishService.getById(orderedDish.dishId),
+    );
+    const foundedDishes = await Promise.all(searchDishes);
+    order.orderedDishes = order.orderedDishes.map((orderedDish) => {
+      const newOrderedDish = orderedDish;
+      const foundedDish = foundedDishes.find(
+        (dish) => dish?.id === newOrderedDish.dishId,
+      );
+      if (!foundedDish) {
         throw new NotFoundException();
       }
-      orderedDish.dish = dish;
-      order.totalSum += dish.cost * orderedDish.dishCount;
-    }
+      newOrderedDish.dish = foundedDish;
+      order.totalSum += foundedDish.cost * newOrderedDish.dishCount;
+      return newOrderedDish;
+    });
     order.totalSum = parseFloat(order.totalSum.toFixed(this.countOfDigitsAfterInteger));
     order.orderHistoryId = (await this.archiveService.createOrderHistory(order)).id;
     const createdOrder = await this.orderService.create(order);
     if (user.isInRole(Roles.Cash)) {
       this.appGateway.addOrderToCash(createdOrder);
     }
-    return;
   }
 
   @Post('delete')
@@ -64,7 +74,9 @@ export class OrderController {
     if (user.isInRole(Roles.Customer) && (order?.userId !== user.id || order.isPaid)) {
       throw new ForbiddenException();
     }
-    const orderHistory = await this.archiveService.getOrderHistoryById(order?.orderHistoryId as string, true);
+    const orderHistory = await this.archiveService.getOrderHistoryById(
+      order?.orderHistoryId as string, true,
+    );
     if (!orderHistory) {
       throw new NotFoundException();
     }
@@ -73,7 +85,6 @@ export class OrderController {
     if (user.isInRole(Roles.Cook)) {
       this.appGateway.removeOrderFromCook(orderId);
     }
-    return;
   }
 
   @Get('getById')
@@ -103,12 +114,16 @@ export class OrderController {
     if (user.isInRole(Roles.Customer)) {
       orders = await this.orderService.getByUserId(user.id);
     }
-    orders.forEach((order) => {
-      order.orderedDishes.forEach((orderedDish) => {
-        orderedDish.dish.photo = Buffer.from('');
+    const newOrders = orders.map((order) => {
+      const newOrder = { ...order };
+      newOrder.orderedDishes = order.orderedDishes.map((orderedDish) => {
+        const newOrderedDish = { ...orderedDish };
+        newOrderedDish.dish.photo = Buffer.from('');
+        return newOrderedDish;
       });
+      return newOrder as Order;
     });
-    return orders;
+    return newOrders;
   }
 
   @ForRoles(Roles.Cash, Roles.Admin)
@@ -123,13 +138,12 @@ export class OrderController {
     }
     await this.orderService.confirmPayment(order);
     this.appGateway.addOrderToCook(order);
-    return;
   }
 
   @ForRoles(Roles.Cook)
   @Post('confirmReadyStatus')
   async confirmReadyStatus(
-    @GetUser() user: User, 
+    @GetUser() user: User,
     @Body('orderId') orderId: number,
   ): Promise<void> {
     if (!orderId) {
@@ -144,12 +158,11 @@ export class OrderController {
     }
     await this.orderService.confirmReadyStatus(order);
     this.userService.sendPushNotification(
-      user.pushToken as string, 
-      'Замовлення', 
-      `Ваше замовлення №${order.id} чекає на вас.`
+      user.pushToken as string,
+      'Замовлення',
+      `Ваше замовлення №${order.id} чекає на вас.`,
     );
     this.appGateway.setOrderToReady(orderId);
-    return;
   }
 
   @ForRoles(Roles.Cook)
@@ -168,23 +181,22 @@ export class OrderController {
     }
     await this.orderService.archive(order, orderHistory);
     this.appGateway.removeOrderFromCook(orderId);
-    return;
   }
 
   @ForRoles(Roles.Admin)
   @Get('getArchivedOrders/:date')
-  async getArchivedOrders(@Param('date') date: string): Promise<{ 
-    count: number, 
-    name: string, 
-    cost: number 
+  async getArchivedOrders(@Param('date') date: string): Promise<{
+    count: number,
+    name: string,
+    cost: number
   }[]> {
     const dishes = await this.archiveService.getOrderedDishesHistoryByDate(new Date(date));
-    return dishes.map((dish) => {
-      return {
-        count: dish.dishCount,
-        name: dish.dishHistory.name,
-        cost: dish.dishHistory.cost,
-      };
-    });
+    return dishes.map((dish) => ({
+      count: dish.dishCount,
+      name: dish.dishHistory.name,
+      cost: dish.dishHistory.cost,
+    }));
   }
 }
+
+export default OrderController;

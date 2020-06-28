@@ -1,10 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
-import { Dish } from "./Dish";
-import { IsNotEmpty } from "class-validator";
+import {
+  Entity, PrimaryGeneratedColumn, Column, OneToMany,
+} from 'typeorm';
+import { IsNotEmpty } from 'class-validator';
+import Dish from './Dish';
 
 @Entity()
-export class Category {
-
+class Category {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
@@ -12,7 +13,8 @@ export class Category {
   @Column()
   name!: string;
 
-  @OneToMany(type => Dish, dish => dish.category)
+  @OneToMany((type) => Dish, (dish) => dish.category)
   dishes!: Dish[];
-
 }
+
+export default Category;

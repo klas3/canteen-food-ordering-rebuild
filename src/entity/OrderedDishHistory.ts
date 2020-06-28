@@ -1,10 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm";
-import { DishHistory } from "./DishHistory";
-import { OrderHistory } from "./OrderHistory";
+import {
+  Entity, PrimaryGeneratedColumn, Column, ManyToOne,
+} from 'typeorm';
+import DishHistory from './DishHistory';
+import OrderHistory from './OrderHistory';
 
 @Entity()
-export class OrderedDishHistory {
-
+class OrderedDishHistory {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
@@ -17,10 +18,11 @@ export class OrderedDishHistory {
   @Column()
   orderHistoryId!: string;
 
-  @ManyToOne(type => DishHistory, dishHistory => dishHistory.orderedDishHistories)
+  @ManyToOne((type) => DishHistory, (dishHistory) => dishHistory.orderedDishHistories)
   dishHistory!: DishHistory;
 
-  @ManyToOne(type => OrderHistory, orderHistory => orderHistory.orderedDishHistories)
+  @ManyToOne((type) => OrderHistory, (orderHistory) => orderHistory.orderedDishHistories)
   orderHistory!: OrderHistory;
-
 }
+
+export default OrderedDishHistory;

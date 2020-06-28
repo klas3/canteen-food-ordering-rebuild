@@ -1,16 +1,18 @@
 import { Injectable } from '@nestjs/common';
-import { UserService } from '../user/user.service';
 import { JwtService } from '@nestjs/jwt';
-import { User } from '../entity/User';
-import { EmailService } from '../email/email.service';
 import * as bcrypt from 'bcrypt';
+import UserService from '../user/user.service';
+import User from '../entity/User';
+import EmailService from '../email/email.service';
 
 @Injectable()
-export class AuthService {
+class AuthService {
   public readonly extraResetCodeMinutes: number = 5;
+
   public readonly msMinutes: number = 60000;
 
   private readonly resetCodeLength: number = 8;
+
   private readonly hashRounds: number = 10;
 
   constructor(
@@ -20,12 +22,13 @@ export class AuthService {
   ) {}
 
   async register(user: User): Promise<void> {
-    user.password = await bcrypt.hash(user.password, this.hashRounds);
-    await this.userService.create(user);
+    const newUser = user;
+    newUser.password = await bcrypt.hash(newUser.password, this.hashRounds);
+    await this.userService.create(newUser);
   }
 
   async login(user: User): Promise<string> {
-    const payload = { 
+    const payload = {
       id: user.id,
       login: user.login,
       password: user.password,
@@ -54,9 +57,11 @@ export class AuthService {
   private generateResetCode(): string {
     const result: string[] = [];
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    for (let i = 0; i < this.resetCodeLength; i++) {
+    for (let i = 0; i < this.resetCodeLength; i += 1) {
       result.push(characters.charAt(Math.floor(Math.random() * characters.length)));
     }
     return result.join('');
   }
 }
+
+export default AuthService;

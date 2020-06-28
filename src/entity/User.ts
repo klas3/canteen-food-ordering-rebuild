@@ -1,12 +1,13 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, BeforeInsert, ManyToOne, BaseEntity } from "typeorm";
+import {
+  Entity, PrimaryGeneratedColumn, Column, OneToMany, BeforeInsert, ManyToOne, BaseEntity,
+} from 'typeorm';
 import * as bcrypt from 'bcrypt';
-import { Order } from "./Order";
-import { Roles } from "../auth/roles";
 import { IsNotEmpty } from 'class-validator';
+import Order from './Order';
+import Roles from '../auth/roles';
 
 @Entity()
-export class User {
-
+class User {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
@@ -27,22 +28,22 @@ export class User {
 
   @Column()
   resetCode?: string;
-  
+
   @Column()
   lastResetCodeCreationTime?: Date;
 
-  @OneToMany(type => Order, order => order.user)
+  @OneToMany((type) => Order, (order) => order.user)
   orders!: Order[]
 
   @Column()
   role!: Roles;
-  
+
   async changePassword(newPassword: string): Promise<void> {
     this.password = await bcrypt.hash(newPassword, 10);
   }
 
   async comparePassword(password: string): Promise<boolean> {
-    return await bcrypt.compare(password, this.password);
+    return bcrypt.compare(password, this.password);
   }
 
   setResetCode(code: string | undefined): void {
@@ -57,5 +58,6 @@ export class User {
   isInRole(role: Roles) {
     return this.role === role;
   }
-
 }
+
+export default User;

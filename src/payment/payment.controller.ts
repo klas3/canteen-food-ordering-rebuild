@@ -1,10 +1,12 @@
-import { Controller, Param, Post, Body, ForbiddenException, NotFoundException, Get } from '@nestjs/common';
-import { OrderService } from '../order/order.service';
-import { PaymentService } from './payment.service';
+import {
+  Controller, Param, Post, Body, ForbiddenException, NotFoundException, Get,
+} from '@nestjs/common';
+import OrderService from '../order/order.service';
+import PaymentService from './payment.service';
 import { Authorize } from '../auth/auth.decorators';
 
 @Controller('payment')
-export class PaymentController {
+class PaymentController {
   constructor(
     private readonly orderService: OrderService,
     private readonly paymentService: PaymentService,
@@ -19,7 +21,7 @@ export class PaymentController {
     }
     const data = await this.paymentService.getData(order);
     return {
-      data: data,
+      data,
       signature: await this.paymentService.getSignature(data),
     };
   }
@@ -30,8 +32,8 @@ export class PaymentController {
     @Body('signature') signature: string,
     @Body('data') data: string,
   ): Promise<void> {
-    signature = signature.replace(' ', '+');
-    if (signature !== await this.paymentService.getSignature(data)) {
+    const validSignature = signature.replace(' ', '+');
+    if (validSignature !== await this.paymentService.getSignature(data)) {
       throw new ForbiddenException();
     }
     if ((JSON.parse(Buffer.from(data, 'base64').toString())).Status !== 'success') {
@@ -41,6 +43,8 @@ export class PaymentController {
     if (!order) {
       throw new NotFoundException();
     }
-    return await this.orderService.confirmPayment(order);
+    return this.orderService.confirmPayment(order);
   }
 }
+
+export default PaymentController;

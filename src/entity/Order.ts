@@ -1,12 +1,13 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne, OneToOne, JoinColumn } from "typeorm";
-import { OrderedDish } from './OrderedDish';
-import { User } from './User';
-import { IsNotEmpty } from "class-validator";
-import { OrderHistory } from "./OrderHistory";
+import {
+  Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne, OneToOne, JoinColumn,
+} from 'typeorm';
+import { IsNotEmpty } from 'class-validator';
+import OrderedDish from './OrderedDish';
+import User from './User';
+import OrderHistory from './OrderHistory';
 
 @Entity()
-export class Order {
-
+class Order {
   @PrimaryGeneratedColumn('increment')
   id!: number;
 
@@ -35,15 +36,15 @@ export class Order {
   @Column()
   orderHistoryId!: string;
 
-  @OneToOne(type => OrderHistory)
+  @OneToOne((type) => OrderHistory)
   @JoinColumn()
   orderHistory!: OrderHistory;
 
-  @ManyToOne(type => User, user => user.orders)
+  @ManyToOne((type) => User, (user) => user.orders)
   user!: User;
 
   @IsNotEmpty()
-  @OneToMany(type => OrderedDish, orderedDish => orderedDish.order)
+  @OneToMany((type) => OrderedDish, (orderedDish) => orderedDish.order)
   orderedDishes!: OrderedDish[];
 
   confirmPayment(): void {
@@ -53,5 +54,6 @@ export class Order {
   confirmReadyStatus(): void {
     this.isReady = true;
   }
-
 }
+
+export default Order;

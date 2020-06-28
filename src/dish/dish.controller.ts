@@ -1,15 +1,18 @@
-import { Controller, Post, Body, BadRequestException, Get, NotFoundException, ForbiddenException } from '@nestjs/common';
-import { DishService } from './dish.service';
-import { Dish } from '../entity/Dish';
+import {
+  Controller, Post, Body, BadRequestException, Get, NotFoundException, ForbiddenException,
+} from '@nestjs/common';
+import DishService from './dish.service';
+import Dish from '../entity/Dish';
 import { Authorize, ForRoles } from '../auth/auth.decorators';
-import { Roles } from '../auth/roles';
-import { ArchiveService } from '../archive/archive.service';
-import { CategoryService } from '../category/category.service';
+import Roles from '../auth/roles';
+import ArchiveService from '../archive/archive.service';
+import CategoryService from '../category/category.service';
 
 @Authorize()
 @Controller('dish')
-export class DishController {
+class DishController {
   private readonly maxImageSize: number = 400 * 1024;
+
   private readonly countOfDigitsAfterInteger: number = 2;
 
   constructor(
@@ -20,18 +23,19 @@ export class DishController {
 
   @ForRoles(Roles.Cook)
   @Post('create')
-  async create(@Body() dish: Dish): Promise<void> {
+  async create(@Body() incomingDish: Dish): Promise<void> {
+    const dish = incomingDish;
     await this.validateDish(dish);
     const dishHistory = await this.archiveService.createDishHistory(dish);
     dish.dishHistoryId = dishHistory.id;
     dish.cost = parseFloat(dish.cost.toFixed(this.countOfDigitsAfterInteger));
     await this.dishService.create(dish);
-    return;
   }
 
   @ForRoles(Roles.Cook)
   @Post('update')
-  async update(@Body() dish: Dish): Promise<void> {
+  async update(@Body() incomingDish: Dish): Promise<void> {
+    const dish = incomingDish;
     await this.validateDish(dish);
     const currentDish = await this.dishService.getById(dish.id);
     if (!currentDish) {
@@ -42,7 +46,6 @@ export class DishController {
     dish.dishHistoryId = dishHistory.id;
     dish.cost = parseFloat(dish.cost.toFixed(this.countOfDigitsAfterInteger));
     await this.dishService.update(dish);
-    return;
   }
 
   @ForRoles(Roles.Cook)
@@ -57,12 +60,11 @@ export class DishController {
     }
     await this.dishService.delete(id);
     await this.archiveService.deleteEmptyDishHistory(dish.dishHistoryId);
-    return;
   }
 
   @Get('getAll')
   async getAll(): Promise<Dish[]> {
-    return await this.dishService.getAll();
+    return this.dishService.getAll();
   }
 
   private async validateDish(dish: Dish): Promise<void> {
@@ -74,3 +76,5 @@ export class DishController {
     }
   }
 }
+
+export default DishController;

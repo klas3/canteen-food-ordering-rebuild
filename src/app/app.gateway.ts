@@ -1,8 +1,8 @@
 import { WebSocketGateway, OnGatewayConnection, WebSocketServer } from '@nestjs/websockets';
-import { Order } from 'src/entity/Order';
+import Order from '../entity/Order';
 
 @WebSocketGateway()
-export class AppGateway implements OnGatewayConnection {
+class AppGateway implements OnGatewayConnection {
   @WebSocketServer()
   private readonly server: any;
 
@@ -26,3 +26,5 @@ export class AppGateway implements OnGatewayConnection {
     this.server.emit('removeOrderFromCook', orderId);
   }
 }
+
+export default AppGateway;

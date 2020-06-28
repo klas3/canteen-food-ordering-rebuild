@@ -1,29 +1,29 @@
 import { Injectable } from '@nestjs/common';
-import { User } from '../entity/User';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import fetch from 'node-fetch';
-import { Roles } from '../auth/roles';
+import User from '../entity/User';
+import Roles from '../auth/roles';
 
 @Injectable()
-export class UserService {
+class UserService {
   private readonly pushNotificationsServiceUrl: string = 'https://exp.host/--/api/v2/push/send';
 
   constructor(
-		@InjectRepository(User)
-		private readonly userRepository: Repository<User>
-	) {}
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
+  ) {}
 
   async create(user: User): Promise<User> {
-    return await this.userRepository.save(user);
+    return this.userRepository.save(user);
   }
 
   async update(user: User): Promise<void> {
     await this.userRepository.update(user.id, user);
   }
 
-	async getById(id: string): Promise<User | undefined> {
-    return await this.userRepository.findOne({ id });
+  async getById(id: string): Promise<User | undefined> {
+    return this.userRepository.findOne({ id });
   }
 
   async isLoginUnique(login: string): Promise<boolean> {
@@ -33,7 +33,7 @@ export class UserService {
   async isEmailUnique(email: string): Promise<boolean> {
     return await this.userRepository.findOne({ email }) === undefined;
   }
-  
+
   async getEmailById(id: string): Promise<string> {
     const { email } = await this.userRepository.findOne(id) as User;
     return email;
@@ -45,11 +45,11 @@ export class UserService {
   }
 
   async getByLogin(login: string): Promise<User | undefined> {
-    return await this.userRepository.findOne({ login });
+    return this.userRepository.findOne({ login });
   }
 
   async getByEmail(email: string): Promise<User | undefined> {
-    return await this.userRepository.findOne({ email });
+    return this.userRepository.findOne({ email });
   }
 
   async setResetCode(resetCode: string, id: string): Promise<void> {
@@ -75,10 +75,12 @@ export class UserService {
       title,
       body: message,
       sound: 'default',
-    }
+    };
     fetch(this.pushNotificationsServiceUrl, {
       method: 'POST',
       body: JSON.stringify(data),
     });
   }
 }
+
+export default UserService;

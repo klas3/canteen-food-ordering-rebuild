@@ -1,26 +1,28 @@
 import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
-import { Dish } from '../entity/Dish';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DishHistory } from '../entity/DishHistory';
+import Dish from '../entity/Dish';
+import DishHistory from '../entity/DishHistory';
 
 @Injectable()
-export class DishService {
+class DishService {
   constructor(
     @InjectRepository(Dish)
     private readonly dishRepository: Repository<Dish>,
     @InjectRepository(DishHistory)
-    private readonly dishHistoryRepository: Repository<DishHistory>
+    private readonly dishHistoryRepository: Repository<DishHistory>,
   ) {}
 
   async create(dish: Dish): Promise<Dish> {
-    dish.photo = Buffer.from(dish.photo);
-    return await this.dishRepository.save(dish);
+    const newDish = dish;
+    newDish.photo = Buffer.from(newDish.photo);
+    return this.dishRepository.save(newDish);
   }
 
   async update(dish: Dish): Promise<void> {
-    dish.photo = Buffer.from(dish.photo);
-    await this.dishRepository.update(dish.id, dish);
+    const updatedDish = dish;
+    updatedDish.photo = Buffer.from(updatedDish.photo);
+    await this.dishRepository.update(updatedDish.id, updatedDish);
   }
 
   async delete(id: string): Promise<void> {
@@ -28,14 +30,16 @@ export class DishService {
   }
 
   async getById(id: string): Promise<Dish | undefined> {
-    return await this.dishRepository.findOne({ where: { id }, relations: ['orderedDishes'] });
+    return this.dishRepository.findOne({ where: { id }, relations: ['orderedDishes'] });
   }
 
   async getHistoryById(id: string): Promise<DishHistory | undefined> {
-    return await this.dishHistoryRepository.findOne(id);
+    return this.dishHistoryRepository.findOne(id);
   }
 
   async getAll(): Promise<Dish[]> {
-    return await this.dishRepository.find();
+    return this.dishRepository.find();
   }
 }
+
+export default DishService;

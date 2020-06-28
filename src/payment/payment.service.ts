@@ -1,20 +1,20 @@
 import { Injectable } from '@nestjs/common';
 import * as crypto from 'crypto-js';
-import { Order } from '../entity/Order';
+import Order from '../entity/Order';
 
 @Injectable()
-export class PaymentService {
+class PaymentService {
   async getData(order: Order): Promise<string> {
     const data = {
       action: 'pay',
       amount: order.totalSum.toString(),
       description: `Оплата замовлення №${order.id}`,
-      version: "3",
+      version: '3',
       order_Id: order.id.toString(),
-      currency: "UAH",
+      currency: 'UAH',
       public_key: process.env.PUBLIC_KEY,
-      server_url: `${process.env.PAYMENT_RESPONSE_URL}${order.id}`
-    }
+      server_url: `${process.env.PAYMENT_RESPONSE_URL}${order.id}`,
+    };
     return Buffer.from(JSON.stringify(data)).toString('base64');
   }
 
@@ -23,3 +23,5 @@ export class PaymentService {
     return Buffer.from(crypto.SHA1(signature).toString()).toString('base64');
   }
 }
+
+export default PaymentService;

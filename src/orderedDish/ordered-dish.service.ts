@@ -1,17 +1,17 @@
 import { Injectable } from '@nestjs/common';
-import { OrderedDish } from '../entity/OrderedDish';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import OrderedDish from '../entity/OrderedDish';
 
 @Injectable()
-export class OrderedDishService {
+class OrderedDishService {
   constructor(
     @InjectRepository(OrderedDish)
     private readonly orderedDishRepository: Repository<OrderedDish>,
   ) {}
 
   async create(orderedDish: OrderedDish): Promise<OrderedDish> {
-    return await this.orderedDishRepository.save(orderedDish);
+    return this.orderedDishRepository.save(orderedDish);
   }
 
   async delete(id: string): Promise<void> {
@@ -19,6 +19,8 @@ export class OrderedDishService {
   }
 
   async getByOrderId(orderId: number): Promise<OrderedDish[]> {
-    return await this.orderedDishRepository.find({ orderId });
+    return this.orderedDishRepository.find({ orderId });
   }
 }
+
+export default OrderedDishService;
