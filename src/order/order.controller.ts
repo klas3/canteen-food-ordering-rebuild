@@ -158,7 +158,7 @@ class OrderController {
     }
     await this.orderService.confirmReadyStatus(order);
     this.userService.sendPushNotification(
-      user.pushToken as string,
+      order.user.pushToken as string,
       'Замовлення',
       `Ваше замовлення №${order.id} чекає на вас.`,
     );
