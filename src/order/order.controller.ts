@@ -136,16 +136,17 @@ class OrderController {
     if (!order) {
       throw new NotFoundException();
     }
+    const orderWithRelations = await this.orderService.getById(orderId, true);
+    if (!orderWithRelations) {
+      throw new NotFoundException();
+    }
     await this.orderService.confirmPayment(order);
-    this.appGateway.addOrderToCook(order);
+    this.appGateway.addOrderToCook(orderWithRelations);
   }
 
   @ForRoles(Roles.Cook)
   @Post('confirmReadyStatus')
-  async confirmReadyStatus(
-    @GetUser() user: User,
-    @Body('orderId') orderId: number,
-  ): Promise<void> {
+  async confirmReadyStatus(@Body('orderId') orderId: number): Promise<void> {
     if (!orderId) {
       throw new BadRequestException();
     }
@@ -156,9 +157,13 @@ class OrderController {
     if (!order.isPaid) {
       throw new ForbiddenException('Замовлення ще не оплачене');
     }
+    const user = await this.userService.getById(order.userId);
+    if (!user) {
+      throw new NotFoundException();
+    }
     await this.orderService.confirmReadyStatus(order);
     this.userService.sendPushNotification(
-      order.user.pushToken as string,
+      user.pushToken as string,
       'Замовлення',
       `Ваше замовлення №${order.id} чекає на вас.`,
     );

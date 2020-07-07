@@ -47,7 +47,7 @@ class OrderService {
     }
     return this.orderRepository.findOne({
       where: { id },
-      relations: ['user', 'orderedDishes', 'orderedDishes.dish'],
+      relations: ['orderedDishes', 'orderedDishes.dish'],
     });
   }
 
